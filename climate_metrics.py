@@ -4,8 +4,7 @@ by the International Governmental Panel on Climate Change."""
 
 
 import numpy as np
-from scipy.integrate import trapz
-from scipy.signal import convolve
+
 
 # W m–2 ppbv-1
 RADIATIVE_EFFICIENCY_ppbv = {"co2": 1.37e-5, "ch4": 3.63e-4, "n2o": 3.00e-3}
@@ -110,7 +109,12 @@ def radiative_forcing_per_kg(t, ghg):
     return radiative_efficiency * impulse_response_function(t, ghg)
 
 
-def radiative_forcing_from_emissions_scenario(time_horizon, emissions, ghg, step_size, mode='full'):
+def radiative_forcing_from_emissions_scenario(
+        time_horizon,
+        emissions,
+        ghg,
+        step_size,
+        mode='full'):
     """
     Parameters
     ---------------
@@ -238,7 +242,8 @@ def dynamic_AGWP(time_horizon, net_emissions, ghg, step_size, mode='valid'):
 
     if len(t) < len(net_emissions):
         raise ValueError(
-            f"Expected time axis to always be larger than net_emissions {net_emissions.shape}, {t.shape}.")
+            f"Expected time axis to always be larger than net_emissions \
+                {net_emissions.shape}, {t.shape}.")
 
     AGWP_GHG = AGWP(ghg, t)
     steps = int(time_horizon/step_size)
@@ -252,23 +257,23 @@ def dynamic_GWP(time_horizon, net_emissions, ghg, step_size=0.1, is_unit_impulse
     ------------
 
     Global Warming Potential is defined as the cumulative radiative forcing
-    of :math:`GHG_x` emitted in year = 0 over a given time-horizon 
+    of :math:`GHG_x` emitted in year = 0 over a given time-horizon
     (:math:`t`):
 
     .. math:
-        GWP(t) = \frac{cumulativeRadiativeForcingGHG\_x(t)}
-                    {cumulativeRadiativeForcing\_CO2(t)}
+        GWP(t) = \\frac{cumulativeRadiativeForcingGHG\\_x(t)}
+                    {cumulativeRadiativeForcing\\_CO2(t)}
 
-    Dynamic GWP ([1]_, [2]_ [3]_, [4]_) is the cumulative radiative forcing due 
-    to annual emissions (:math:`t'`) of :math:`GHG_x` over a give time-horizon 
+    Dynamic GWP ([1]_, [2]_ [3]_, [4]_) is the cumulative radiative forcing due
+    to annual emissions (:math:`t'`) of :math:`GHG_x` over a give time-horizon
     (:math:`t`) which can be expressed as:
 
     .. math:
         dynamicGWP_x(t, t')
-                    = {\mathbf{emission_x}(t')}\cdot{\mathbf{GWP_x}(t-t')}
-                    = \sum_{t'}{\mathbf{emission_x}(t'){\mathbf{GWP_x}(t-t')}}
+                    = {\\mathbf{emission_x}(t')}\\cdot{\\mathbf{GWP_x}(t-t')}
+                    = \\sum_{t'}{\\mathbf{emission_x}(t'){\\mathbf{GWP_x}(t-t')}}
                     = \frac{
-                    \sum_{t'}{cumulativeRadiativeForcingGHG_x(t-t')}}
+                    \\sum_{t'}{cumulativeRadiativeForcingGHG_x(t-t')}}
                     {cumulativeRadiativeForcing_{CO2}(t)}
 
 
@@ -296,18 +301,16 @@ def dynamic_GWP(time_horizon, net_emissions, ghg, step_size=0.1, is_unit_impulse
 
     References
     --------------
-    .. [1] Fearnside et al. 2000.  https://link.springer.com/article/10.1023/A:1009625122628
-    .. [2] Moura Costa et al. 2000.  https://link.springer.com/article/10.1023/A:1009697625521
+    .. [1] Fearnside et al. 2000.  https://link.springer.com/article/10.1023/A:1009625122628  # noqa: E501
+    .. [2] Moura Costa et al. 2000.  https://link.springer.com/article/10.1023/A:1009697625521  # noqa: E501
     .. [3] Levassuer et al. 2010.  https://pubs.acs.org/doi/10.1021/es9030003
-    .. [4] Cherubini et al. 2011.  https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1757-1707.2011.01102.x
+    .. [4] Cherubini et al. 2011.  https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1757-1707.2011.01102.x  # noqa: E501
 
 
     """
     dynamic_AGWP_GHG = dynamic_AGWP(time_horizon, net_emissions, ghg, step_size)
     # A step of 0.1 is recommended to reduce the integration error
-    t = np.arange(0, time_horizon+step_size, step_size)
     # AGWP for each time step
-    AGWP = AGWP_CO2(t)
     dynamic_GWP_t = dynamic_AGWP_GHG / AGWP_CO2(100)
 
     # If the input is not a unit_impulse, we have to re-normalize
@@ -322,7 +325,7 @@ def dynamic_GWP(time_horizon, net_emissions, ghg, step_size=0.1, is_unit_impulse
         return dynamic_GWP_t[0] * step_size
 
 
-# Short-term and long-term temperature response 
+# Short-term and long-term temperature response
 # (Kelvin per (Watt per m2)) to radiative forcing
 TEMPERATURE_RESPONSE_COEFFICIENTS = [0.631, 0.429]
 # Temporal scaling factors (years)
@@ -340,15 +343,20 @@ def AGTP_CO2(t):
 
     temperature_response = 0
     for j in range(2):
-        short_term_temperature_response = COEFFICIENT_WEIGHTS[0] * TEMPERATURE_RESPONSE_COEFFICIENTS[j]
+        short_term_temperature_response = COEFFICIENT_WEIGHTS[0] \
+            * TEMPERATURE_RESPONSE_COEFFICIENTS[j]
         temporal_weight_1 = np.exp(-t/TEMPORAL_WEIGHTS[j])
-        weighted_short_term_temperature_response = short_term_temperature_response * (1 - temporal_weight_1)
+        weighted_short_term_temperature_response = short_term_temperature_response \
+            * (1 - temporal_weight_1)
 
         weighted_long_term_temperature_response = 0
         for i in range(3):
-            temporal_weight_2_linear = TIME_SCALES[i] / (TIME_SCALES[i] - TEMPORAL_WEIGHTS[j])
-            long_term_temperature_response = COEFFICIENT_WEIGHTS[i+1] * TEMPERATURE_RESPONSE_COEFFICIENTS[j]
-            long_term_temperature_response = long_term_temperature_response * temporal_weight_2_linear
+            temporal_weight_2_linear = TIME_SCALES[i] \
+                / (TIME_SCALES[i] - TEMPORAL_WEIGHTS[j])
+            long_term_temperature_response = COEFFICIENT_WEIGHTS[i+1] \
+                * TEMPERATURE_RESPONSE_COEFFICIENTS[j]
+            long_term_temperature_response = long_term_temperature_response \
+                * temporal_weight_2_linear
             temporal_weight_2_exponential = np.exp(-t/TIME_SCALES[i])
             weighted_long_term_temperature_response += (
                 long_term_temperature_response
@@ -436,7 +444,7 @@ def temperature_response(time_horizon, emissions, ghg, step_size, mode='valid'):
 
 
     References
-        .. [1] Equation 8.1 in https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf
+        .. [1] Equation 8.1 in https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf  # noqa: E501
     """
     t = np.arange(0, time_horizon+step_size, step_size)
     AGTP_GHG = AGTP(ghg, t)
