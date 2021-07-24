@@ -61,10 +61,10 @@ def test_AGTP_non_CO2():
     IPCC, 2013. AR5, WG1, Chapter 8.  Appendix 8.A.
     https://www.ipcc.ch/report/ar5/wg1/
     """
-    assert np.isclose(4.62e-14/AGTP_non_CO2('ch4', 20), 1, atol=1e-2)
-    assert np.isclose(2.34e-15/AGTP_non_CO2('ch4', 100), 1, atol=1e-2)
-    assert np.isclose(1.89e-13/AGTP_non_CO2('n2o', 20), 1, atol=1e-2)
-    assert np.isclose(1.28e-13/AGTP_non_CO2('n2o', 100), 1, atol=1e-2)
+    assert np.isclose(4.62e-14/AGTP_non_CO2(20, 'ch4'), 1, atol=1e-2)
+    assert np.isclose(2.34e-15/AGTP_non_CO2(100, 'ch4'), 1, atol=1e-2)
+    assert np.isclose(1.89e-13/AGTP_non_CO2(20, 'n2o'), 1, atol=1e-2)
+    assert np.isclose(1.28e-13/AGTP_non_CO2(100, 'n2o'), 1, atol=1e-2)
 
 
 def test_dynamic_GWP():

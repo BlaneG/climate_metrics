@@ -250,7 +250,12 @@ def dynamic_AGWP(time_horizon, net_emissions, ghg, step_size, mode='valid'):
     return _convolve_metric(steps, net_emissions, AGWP_GHG, mode=mode)
 
 
-def dynamic_GWP(time_horizon, net_emissions, ghg, step_size=0.1, is_unit_impulse=False):
+def dynamic_GWP(
+        time_horizon,
+        net_emissions,
+        ghg, step_size=0.1,
+        is_unit_impulse=False,
+        mode='valid'):
     """Computes CO2 equivalent radiative forcing for net_emissions.
 
     Notes
@@ -308,7 +313,7 @@ def dynamic_GWP(time_horizon, net_emissions, ghg, step_size=0.1, is_unit_impulse
 
 
     """
-    dynamic_AGWP_GHG = dynamic_AGWP(time_horizon, net_emissions, ghg, step_size)
+    dynamic_AGWP_GHG = dynamic_AGWP(time_horizon, net_emissions, ghg, step_size, mode)
     # A step of 0.1 is recommended to reduce the integration error
     # AGWP for each time step
     dynamic_GWP_t = dynamic_AGWP_GHG / AGWP_CO2(100)
@@ -320,9 +325,9 @@ def dynamic_GWP(time_horizon, net_emissions, ghg, step_size=0.1, is_unit_impulse
     # One issue with this later approach is that the output can look
     # strange when you plot the results because the pdf will spike to 10.
     if is_unit_impulse:
-        return dynamic_GWP_t[0]
+        return dynamic_GWP_t
     else:
-        return dynamic_GWP_t[0] * step_size
+        return dynamic_GWP_t * step_size
 
 
 # Short-term and long-term temperature response
@@ -370,7 +375,7 @@ def AGTP_CO2(t):
     return radiative_efficiency * temperature_response
 
 
-def AGTP_non_CO2(ghg, t):
+def AGTP_non_CO2(t, ghg):
     radiative_efficiency = _get_radiative_efficiency_kg(ghg)
     ghg_lifetime = _get_GHG_lifetime(ghg)
 
@@ -400,11 +405,11 @@ def AGTP_non_CO2(ghg, t):
         return radiative_efficiency * temperature_response
 
 
-def AGTP(ghg, t):
+def AGTP(t, ghg):
     if ghg.lower() == 'co2':
         return AGTP_CO2(t)
     else:
-        return AGTP_non_CO2(ghg, t)
+        return AGTP_non_CO2(t, ghg)
 
 
 def GTP(t, ghg) -> float:
@@ -418,7 +423,7 @@ def GTP(t, ghg) -> float:
         The ghg for which GTP is computed.
 
     """
-    return AGTP(ghg, t)/AGTP_CO2(t)
+    return AGTP(t, ghg)/AGTP_CO2(t)
 
 
 def temperature_response(time_horizon, emissions, ghg, step_size, mode='valid'):
@@ -447,7 +452,7 @@ def temperature_response(time_horizon, emissions, ghg, step_size, mode='valid'):
         .. [1] Equation 8.1 in https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf  # noqa: E501
     """
     t = np.arange(0, time_horizon+step_size, step_size)
-    AGTP_GHG = AGTP(ghg, t)
+    AGTP_GHG = AGTP(t, ghg)
     if len(t) < len(emissions):
         raise ValueError("Expected time vector to be longer than the emissions vector")
     # return np.dot(emissions, np.flip(AGTP(ghg, t)))
