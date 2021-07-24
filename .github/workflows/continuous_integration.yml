@@ -34,4 +34,4 @@ jobs:
         pytest --nbval notebooks
     - name: Tests
       run: |
-        pytest tests
+        python -m pytest
