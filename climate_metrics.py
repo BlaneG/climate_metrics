@@ -181,7 +181,7 @@ def AGWP_CH4_no_CO2(t):
     Parameters
     -----------
     t : int
-        
+
     Note
     ------
     Does not include indirect effects from CO2 as a result of CH4 conversion to CO2.
@@ -254,46 +254,6 @@ def dynamic_AGWP(time_horizon, net_emissions, ghg, step_size, mode='valid'):
     AGWP_GHG = AGWP(ghg, t)
     steps = int(time_horizon/step_size)
     return _convolve_metric(steps, net_emissions, AGWP_GHG, mode=mode)
-
-
-def GWP(time_horizon,
-        emissions,
-        ghg,
-        step_size=1,
-        annual=False):
-    """Compute global warming potential of emissions.
-
-    Parameters
-    -----------
-    time_horizon : int
-    emissions : int or ndarray
-        If emissions is an int, the emission is assumed to 
-            occur at time=0.
-    ghg : str {'CO2', 'CH4', 'N2O'}, optional
-        Type of GHG emission in `emissions`.
-    step_size : float or int
-        Step size of `emissions` in years.
-    annual : bool
-        If `True`, returns annual GWP over the `time_horizon`. If `False`,
-            returns the single value at `time_horizon`.
-    """
-
-    if type(emissions) is int:
-        empty_array = np.zeros(time_horizon+step_size)
-        empty_array[0] = emissions
-        emissions = empty_array
-
-    result = dynamic_GWP(
-        time_horizon,
-        emissions,
-        ghg,
-        step_size,
-        mode='full')
-
-    if annual:
-        return result
-    else:
-        return result[time_horizon * int(1/step_size)]
 
 
 def dynamic_GWP(
@@ -369,6 +329,46 @@ def dynamic_GWP(
     dynamic_GWP_t = dynamic_AGWP_GHG / AGWP_CO2(100)
 
     return dynamic_GWP_t
+
+
+def GWP(time_horizon,
+        emissions,
+        ghg,
+        step_size=1,
+        annual=False):
+    """Compute global warming potential of emissions.
+
+    Parameters
+    -----------
+    time_horizon : int
+    emissions : int or ndarray
+        If emissions is an int, the emission is assumed to 
+            occur at time=0.
+    ghg : str {'CO2', 'CH4', 'N2O'}, optional
+        Type of GHG emission in `emissions`.
+    step_size : float or int
+        Step size of `emissions` in years.
+    annual : bool
+        If `True`, returns annual GWP over the `time_horizon`. If `False`,
+            returns the single value at `time_horizon`.
+    """
+
+    if type(emissions) is int:
+        empty_array = np.zeros(time_horizon+step_size)
+        empty_array[0] = emissions
+        emissions = empty_array
+
+    result = dynamic_GWP(
+        time_horizon,
+        emissions,
+        ghg,
+        step_size,
+        mode='full')
+
+    if annual:
+        return result
+    else:
+        return result[time_horizon * int(1/step_size)]
 
 
 # Short-term and long-term temperature response
