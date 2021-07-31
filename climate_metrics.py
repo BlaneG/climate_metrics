@@ -266,12 +266,16 @@ def GWP(time_horizon,
     Parameters
     -----------
     time_horizon : int
-    emissions : array_like
-    ghg : str
-    step_size= float or int
+    emissions : int or ndarray
+        If emissions is an int, the emission is assumed to 
+            occur at time=0.
+    ghg : str {'CO2', 'CH4', 'N2O'}, optional
+        Type of GHG emission in `emissions`.
+    step_size : float or int
+        Step size of `emissions` in years.
     annual : bool
-        To return annual GWP over the `time_horizon` or the single value
-            at `time_horizon`.
+        If `True`, returns annual GWP over the `time_horizon`. If `False`,
+            returns the single value at `time_horizon`.
     """
 
     if type(emissions) is int:
@@ -463,7 +467,7 @@ def GTP(t, ghg) -> float:
     return AGTP(t, ghg)/AGTP_CO2(t)
 
 
-def temperature_response(time_horizon, emissions, ghg, step_size, mode='valid'):
+def dynamic_GTP(time_horizon, emissions, ghg, step_size, mode='valid'):
     """
     Global average surface temperature change due to an `emissions` vector.
 
