@@ -453,21 +453,7 @@ def AGTP(t, ghg):
         return AGTP_non_CO2(t, ghg)
 
 
-def GTP(t, ghg) -> float:
-    """
-    Computes the global temperature change potential for 1 kg of `ghg`.
-
-    Parameters
-    t : int
-        The time at which GTP is computed.
-    ghg : str
-        The ghg for which GTP is computed.
-
-    """
-    return AGTP(t, ghg)/AGTP_CO2(t)
-
-
-def dynamic_GTP(time_horizon, emissions, ghg, step_size, mode='valid'):
+def dynamic_AGTP(time_horizon, emissions, ghg, step_size, mode='valid'):
     """
     Global average surface temperature change due to an `emissions` vector.
 
@@ -498,4 +484,3 @@ def dynamic_GTP(time_horizon, emissions, ghg, step_size, mode='valid'):
         raise ValueError("Expected time vector to be longer than the emissions vector")
     steps = int(time_horizon/step_size)
     return _convolve_metric(steps, emissions, AGTP_GHG, mode)
-
