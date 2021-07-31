@@ -228,7 +228,7 @@ def AGWP_N2O(t):
     )
 
 
-def AGWP(ghg, t):
+def AGWP(t, ghg):
     if ghg.lower() == 'co2':
         return AGWP_CO2(t)
     elif ghg.lower() == 'ch4':
@@ -251,7 +251,7 @@ def dynamic_AGWP(time_horizon, net_emissions, ghg, step_size, mode='valid'):
             f"Expected time axis to always be larger than net_emissions \
                 {net_emissions.shape}, {t.shape}.")
 
-    AGWP_GHG = AGWP(ghg, t)
+    AGWP_GHG = AGWP(t, ghg)
     steps = int(time_horizon/step_size)
     return _convolve_metric(steps, net_emissions, AGWP_GHG, mode=mode)
 
@@ -496,6 +496,6 @@ def dynamic_GTP(time_horizon, emissions, ghg, step_size, mode='valid'):
     AGTP_GHG = AGTP(t, ghg)
     if len(t) < len(emissions):
         raise ValueError("Expected time vector to be longer than the emissions vector")
-    # return np.dot(emissions, np.flip(AGTP(ghg, t)))
     steps = int(time_horizon/step_size)
     return _convolve_metric(steps, emissions, AGTP_GHG, mode)
+
