@@ -96,14 +96,16 @@ def radiative_forcing_per_kg(t, ghg):
     t : array_like
         Time at which radiative forcing is computed.
     """
-    if ghg.lower() == 'co2':
+    ghg = ghg.lower()
+
+    if ghg == 'co2':
         radiative_efficiency = _get_radiative_efficiency_kg(ghg)
 
-    elif ghg.lower() == 'ch4':
+    elif ghg == 'ch4':
         radiative_efficiency = _get_radiative_efficiency_kg(ghg)
         radiative_efficiency *= _scaled_radiative_efficiency_from_O3_and_H2O()
 
-    elif ghg.lower() == 'n2o':
+    elif ghg == 'n2o':
         radiative_efficiency = _N2O_radiative_efficiency_after_methane_adjustment()
 
     return radiative_efficiency * impulse_response_function(t, ghg)
@@ -323,12 +325,32 @@ def dynamic_GWP(
 
 
     """
-    dynamic_AGWP_GHG = dynamic_AGWP(time_horizon, net_emissions, ghg, step_size, mode)
-    # A step of 0.1 is recommended to reduce the integration error
-    # AGWP for each time step
-    dynamic_GWP_t = dynamic_AGWP_GHG / AGWP_CO2(100)
+    return _dynamic_climate_metric_template(
+        'dynamic_AGWP',
+        time_horizon,
+        net_emissions,
+        ghg,
+        step_size,
+        mode=mode
+        )
 
-    return dynamic_GWP_t
+
+def _dynamic_climate_metric_template(
+        method,
+        time_horizon,
+        net_emissions,
+        ghg,
+        step_size=0.1,
+        mode='valid'
+        ):
+    """This is a generic function for calling dynamic climate metrics for GWP and GTP."""
+    _check_method(method)
+    physical_metric = eval(method)(time_horizon, net_emissions, ghg, step_size, mode)
+
+    if 'GWP' in method:
+        return physical_metric / AGWP_CO2(100)
+    elif 'GTP' in method:
+        return physical_metric / AGTP_CO2(100)
 
 
 def GWP(time_horizon,
@@ -353,22 +375,13 @@ def GWP(time_horizon,
             returns the single value at `time_horizon`.
     """
 
-    if type(emissions) is int:
-        empty_array = np.zeros(time_horizon+step_size)
-        empty_array[0] = emissions
-        emissions = empty_array
-
-    result = dynamic_GWP(
+    return _climate_metric_template(
+        'dynamic_GWP',
         time_horizon,
         emissions,
         ghg,
         step_size,
-        mode='full')
-
-    if annual:
-        return result
-    else:
-        return result[time_horizon * int(1/step_size)]
+        annual)
 
 
 # Short-term and long-term temperature response
@@ -417,6 +430,7 @@ def AGTP_CO2(t):
 
 
 def AGTP_non_CO2(t, ghg):
+    ghg = ghg.lower()
     radiative_efficiency = _get_radiative_efficiency_kg(ghg)
     ghg_lifetime = _get_GHG_lifetime(ghg)
 
@@ -484,3 +498,100 @@ def dynamic_AGTP(time_horizon, emissions, ghg, step_size, mode='valid'):
         raise ValueError("Expected time vector to be longer than the emissions vector")
     steps = int(time_horizon/step_size)
     return _convolve_metric(steps, emissions, AGTP_GHG, mode)
+
+
+def dynamic_GTP(
+        time_horizon,
+        emissions,
+        ghg,
+        step_size=1,
+        mode='full'):
+    return _dynamic_climate_metric_template(
+        'dynamic_AGTP',
+        time_horizon,
+        emissions,
+        ghg,
+        step_size,
+        mode=mode
+        )
+
+
+def GTP(time_horizon,
+        emissions,
+        ghg,
+        step_size=1,
+        annual=False):
+    """Compute average global temperature change potential of emissions.
+
+    Parameters
+    -----------
+    time_horizon : int
+    emissions : int or ndarray
+        If emissions is an int, the emission is assumed to 
+            occur at time=0.
+    ghg : str {'CO2', 'CH4', 'N2O'}, optional
+        Type of GHG emission in `emissions`.
+    step_size : float or int
+        Step size of `emissions` in years.
+    annual : bool
+        If `True`, returns annual GWP over the `time_horizon`. If `False`,
+            returns the single value at `time_horizon`.
+    """
+
+    return _climate_metric_template(
+        'dynamic_GTP',
+        time_horizon,
+        emissions,
+        ghg,
+        step_size,
+        annual)
+
+
+def _climate_metric_template(
+        method,
+        time_horizon,
+        emissions,
+        ghg,
+        step_size=1,
+        annual=False):
+    """
+
+    Parameters
+    -----------
+    method : str {'dynamic_GWP', 'dynamic_GTP'}
+    time_horizon : int
+    emissions : int or ndarray
+        If emissions is an int, the emission is assumed to
+            occur at time=0.
+    ghg : str {'CO2', 'CH4', 'N2O'}, optional
+        Type of GHG emission in `emissions`.
+    step_size : float or int
+        Step size of `emissions` in years.
+    annual : bool
+        If `True`, returns annual GWP over the `time_horizon`. If `False`,
+            returns the single value at `time_horizon`.
+    """
+    _check_method(method)
+
+    if type(emissions) is int:
+        empty_array = np.zeros(time_horizon+step_size)
+        empty_array[0] = emissions
+        emissions = empty_array
+
+    result = eval(method)(
+        time_horizon,
+        emissions,
+        ghg,
+        step_size,
+        mode='full')
+
+    if annual:
+        return result
+    else:
+        return result[time_horizon * int(1/step_size)]
+
+
+def _check_method(method):
+    expected_values = ['GWP', 'GTP', 'dynamic_GTP', 'dynamic_GWP']
+    if method not in expected_values:
+        raise ValueError(f'str is not in list of expected values: {expected_values}')
