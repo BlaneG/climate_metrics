@@ -178,6 +178,10 @@ def _scaled_radiative_efficiency_from_O3_and_H2O():
 
 def AGWP_CH4_no_CO2(t):
     """
+    Parameters
+    -----------
+    t : int
+        
     Note
     ------
     Does not include indirect effects from CO2 as a result of CH4 conversion to CO2.
@@ -238,8 +242,10 @@ def AGWP(ghg, t):
 def dynamic_AGWP(time_horizon, net_emissions, ghg, step_size, mode='valid'):
     """
     """
+
     t = np.arange(0, time_horizon+step_size, step_size)
 
+    # To compute the convolution over t, net_emissions needs to be as long as t.
     if len(t) < len(net_emissions):
         raise ValueError(
             f"Expected time axis to always be larger than net_emissions \
@@ -250,16 +256,56 @@ def dynamic_AGWP(time_horizon, net_emissions, ghg, step_size, mode='valid'):
     return _convolve_metric(steps, net_emissions, AGWP_GHG, mode=mode)
 
 
+def GWP(time_horizon,
+        emissions,
+        ghg,
+        step_size=1,
+        annual=False):
+    """Compute global warming potential of emissions.
+
+    Parameters
+    -----------
+    time_horizon : int
+    emissions : array_like
+    ghg : str
+    step_size= float or int
+    annual : bool
+        To return annual GWP over the `time_horizon` or the single value
+            at `time_horizon`.
+    """
+
+    if type(emissions) is int:
+        empty_array = np.zeros(time_horizon+step_size)
+        empty_array[0] = emissions
+        emissions = empty_array
+
+    result = dynamic_GWP(
+        time_horizon,
+        emissions,
+        ghg,
+        step_size,
+        mode='full')
+
+    if annual:
+        return result
+    else:
+        return result[time_horizon * int(1/step_size)]
+
+
 def dynamic_GWP(
         time_horizon,
         net_emissions,
-        ghg, step_size=0.1,
-        is_unit_impulse=False,
+        ghg,
+        step_size=0.1,
         mode='valid'):
     """Computes CO2 equivalent radiative forcing for net_emissions.
 
     Notes
     ------------
+    If step_size < 1, the sum of the net_emissions vector must be equal
+    to total emissions. So if a probability density function were used
+    to simulate net_emissions over time, net_emissions would first have
+    to be weighted by step_size before being passed to this function.
 
     Global Warming Potential is defined as the cumulative radiative forcing
     of :math:`GHG_x` emitted in year = 0 over a given time-horizon
@@ -318,16 +364,7 @@ def dynamic_GWP(
     # AGWP for each time step
     dynamic_GWP_t = dynamic_AGWP_GHG / AGWP_CO2(100)
 
-    # If the input is not a unit_impulse, we have to re-normalize
-    # the result by the number of steps per year. An alternative
-    # approach for users to implement a emission using a uniform
-    # distribution (e.g. uniform.pdf(x, loc=emission_year, scale=0.1))
-    # One issue with this later approach is that the output can look
-    # strange when you plot the results because the pdf will spike to 10.
-    if is_unit_impulse:
-        return dynamic_GWP_t
-    else:
-        return dynamic_GWP_t * step_size
+    return dynamic_GWP_t
 
 
 # Short-term and long-term temperature response
