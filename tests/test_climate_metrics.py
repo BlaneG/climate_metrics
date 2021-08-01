@@ -10,7 +10,6 @@ from scipy.stats import uniform
 from climate_metrics import (
     AGWP_CO2,
     AGWP_CH4_no_CO2,
-    dynamic_GWP,
     AGTP_CO2,
     AGWP_N2O,
     AGTP_non_CO2,
@@ -80,7 +79,7 @@ def test_dynamic_GWP():
     emission_year = 0
     expected_GWP_0, emission_pulse = compute_expected_dynamic_GWP(
         emission, emission_year, time_horizon, time_step)
-    actual_GWP_0 = dynamic_GWP(
+    actual_GWP_0 = GWP(
         time_horizon,
         emission_pulse,
         'co2',
@@ -92,7 +91,7 @@ def test_dynamic_GWP():
     emission_year = 25
     expected_GWP_25, emission_pulse = compute_expected_dynamic_GWP(
         emission, emission_year, time_horizon, time_step)
-    actual_GWP_25 = dynamic_GWP(
+    actual_GWP_25 = GWP(
         time_horizon,
         emission_pulse,
         'co2',
@@ -109,7 +108,7 @@ def test_dynamic_GWP():
     # in the test, we don't need the weighting because this
     # is handled by the integration property `dx`.
     emissions = uniform.pdf(t, scale=time_horizon)
-    actual_result = dynamic_GWP(
+    actual_result = GWP(
             time_horizon,
             emissions * time_step,  # see comment above
             'co2',

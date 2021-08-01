@@ -258,13 +258,31 @@ def dynamic_AGWP(time_horizon, net_emissions, ghg, step_size, mode='valid'):
     return _convolve_metric(steps, net_emissions, AGWP_GHG, mode=mode)
 
 
-def dynamic_GWP(
-        time_horizon,
-        net_emissions,
+def GWP(time_horizon,
+        emissions,
         ghg,
-        step_size=0.1,
-        mode='valid'):
-    """Computes CO2 equivalent radiative forcing for net_emissions.
+        step_size=1,
+        annual=False):
+    """Computes the CO2 equivalent radiative forcing of net_emissions.
+
+    Can be used to compute GWP over `time_horizon` of a single pulse emission,
+    or a flow of emissions over time (referred to variously in the literature
+    as tonne-year [1]_, [2]_, [3]_, GWP [4]_, and GWP_bio [5]_).
+
+    Parameters
+    ---------------
+    time_horizon : int
+    emissions : int or ndarray
+        If emissions is an int, the emission is assumed to 
+            occur at time=0.
+    ghg : str {'CO2', 'CH4', 'N2O'}, optional
+        Type of GHG emission in `emissions`.
+    step_size : float or int
+        Step size of `emissions` in years.
+    annual : bool
+        If `True`, returns annual GWP over the `time_horizon`. If `False`,
+            returns the single value at `time_horizon`.
+
 
     Notes
     ------------
@@ -281,9 +299,9 @@ def dynamic_GWP(
         GWP(t) = \\frac{cumulativeRadiativeForcingGHG\\_x(t)}
                     {cumulativeRadiativeForcing\\_CO2(t)}
 
-    Dynamic GWP ([1]_, [2]_ [3]_, [4]_) is the cumulative radiative forcing due
-    to annual emissions (:math:`t'`) of :math:`GHG_x` over a give time-horizon
-    (:math:`t`) which can be expressed as:
+    Dynamic GWP ([1]_, [2]_ [3]_, [4]_) computes the cumulative radiative forcing
+    of annual (:math:`t'`) emissions ():math:`GHG_x`) over a give time-horizon
+    (:math:`t`):
 
     .. math:
         dynamicGWP_x(t, t')
@@ -294,89 +312,19 @@ def dynamic_GWP(
                     {cumulativeRadiativeForcing_{CO2}(t)}
 
 
-    Parameters
-    ---------------
-    time_horizon : int
-        The time horizon over which radiative forcing is computed.
-    net_emissions : np.array
-        Annual emissions/removals.
-    is_unit_impulse : bool
-        Specifies whether net_emissions is a scipy.signal.unit_impulse
-
-
-    Notes
-    ---------------
-    net_emissions should not contain both unit_impulse and pdf emission
-    distributions due to numerical integration issues.  After numerical
-    integration, the output is re-normalized using the step_size when
-    net_emissions is_unit_impulse=False. When is_unit_impulse is true,
-    this normalization is not required.
-
-    TODO
-    -----------------
-    update the method to take an arbitrary AGWP_GHG method
-
     References
     --------------
-    .. [1] Fearnside et al. 2000.  https://link.springer.com/article/10.1023/A:1009625122628  # noqa: E501
-    .. [2] Moura Costa et al. 2000.  https://link.springer.com/article/10.1023/A:1009697625521  # noqa: E501
-    .. [3] Levassuer et al. 2010.  https://pubs.acs.org/doi/10.1021/es9030003
-    .. [4] Cherubini et al. 2011.  https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1757-1707.2011.01102.x  # noqa: E501
+
+    .. [1] IPCC, 2000.  https://archive.ipcc.ch/ipccreports/sres/land_use/index.php?idp=74  # noqa: E501
+    .. [2] Fearnside et al. 2000.  https://link.springer.com/article/10.1023/A:1009625122628  # noqa: E501
+    .. [3] Moura Costa et al. 2000.  https://link.springer.com/article/10.1023/A:1009697625521  # noqa: E501
+    .. [4] Levassuer et al. 2010.  https://pubs.acs.org/doi/10.1021/es9030003
+    .. [5] Cherubini et al. 2011.  https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1757-1707.2011.01102.x  # noqa: E501
 
 
     """
-    return _dynamic_climate_metric_template(
-        'dynamic_AGWP',
-        time_horizon,
-        net_emissions,
-        ghg,
-        step_size,
-        mode=mode
-        )
-
-
-def _dynamic_climate_metric_template(
-        method,
-        time_horizon,
-        net_emissions,
-        ghg,
-        step_size=0.1,
-        mode='valid'
-        ):
-    """This is a generic function for calling dynamic climate metrics for GWP and GTP."""
-    _check_method(method)
-    physical_metric = eval(method)(time_horizon, net_emissions, ghg, step_size, mode)
-
-    if 'GWP' in method:
-        return physical_metric / AGWP_CO2(100)
-    elif 'GTP' in method:
-        return physical_metric / AGTP_CO2(100)
-
-
-def GWP(time_horizon,
-        emissions,
-        ghg,
-        step_size=1,
-        annual=False):
-    """Compute global warming potential of emissions.
-
-    Parameters
-    -----------
-    time_horizon : int
-    emissions : int or ndarray
-        If emissions is an int, the emission is assumed to 
-            occur at time=0.
-    ghg : str {'CO2', 'CH4', 'N2O'}, optional
-        Type of GHG emission in `emissions`.
-    step_size : float or int
-        Step size of `emissions` in years.
-    annual : bool
-        If `True`, returns annual GWP over the `time_horizon`. If `False`,
-            returns the single value at `time_horizon`.
-    """
-
     return _climate_metric_template(
-        'dynamic_GWP',
+        'GWP',
         time_horizon,
         emissions,
         ghg,
@@ -492,27 +440,14 @@ def dynamic_AGTP(time_horizon, emissions, ghg, step_size, mode='valid'):
     References
         .. [1] Equation 8.1 in https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf  # noqa: E501
     """
-    t = np.arange(0, time_horizon+step_size, step_size)
-    AGTP_GHG = AGTP(t, ghg)
-    if len(t) < len(emissions):
-        raise ValueError("Expected time vector to be longer than the emissions vector")
-    steps = int(time_horizon/step_size)
-    return _convolve_metric(steps, emissions, AGTP_GHG, mode)
 
-
-def dynamic_GTP(
-        time_horizon,
-        emissions,
-        ghg,
-        step_size=1,
-        mode='full'):
-    return _dynamic_climate_metric_template(
-        'dynamic_AGTP',
+    return _dynamic_absolute_climate_metric_template(
+        'AGTP',
         time_horizon,
         emissions,
         ghg,
         step_size,
-        mode=mode
+        mode
         )
 
 
@@ -539,7 +474,7 @@ def GTP(time_horizon,
     """
 
     return _climate_metric_template(
-        'dynamic_GTP',
+        'GTP',
         time_horizon,
         emissions,
         ghg,
@@ -558,7 +493,7 @@ def _climate_metric_template(
 
     Parameters
     -----------
-    method : str {'dynamic_GWP', 'dynamic_GTP'}
+    method : str {'GWP', 'GTP'}
     time_horizon : int
     emissions : int or ndarray
         If emissions is an int, the emission is assumed to
@@ -578,12 +513,13 @@ def _climate_metric_template(
         empty_array[0] = emissions
         emissions = empty_array
 
-    result = eval(method)(
-        time_horizon,
-        emissions,
-        ghg,
-        step_size,
-        mode='full')
+    if method == 'GWP':
+        physical_metric = dynamic_AGWP(time_horizon, emissions, ghg, step_size, mode='full')
+        result = physical_metric / AGWP_CO2(100)
+
+    elif method == 'GTP':
+        physical_metric = dynamic_AGWP(time_horizon, emissions, ghg, step_size, mode='full')
+        result = physical_metric / AGTP_CO2(100)
 
     if annual:
         return result
@@ -591,7 +527,56 @@ def _climate_metric_template(
         return result[time_horizon * int(1/step_size)]
 
 
+def _dynamic_climate_metric_template(
+        method,
+        time_horizon,
+        net_emissions,
+        ghg,
+        step_size=0.1,
+        mode='valid'
+        ):
+    """This is a generic function for calling dynamic climate metrics for GWP and GTP."""
+    _check_method(method)
+
+    if method == 'dynamic_AGWP':
+        physical_metric = dynamic_AGWP(time_horizon, net_emissions, ghg, step_size, mode)
+        return physical_metric / AGWP_CO2(100)
+
+    elif method == 'dynamic_AGTP':
+        physical_metric = dynamic_AGWP(time_horizon, net_emissions, ghg, step_size, mode)
+        return physical_metric / AGTP_CO2(100)
+
+
+def _dynamic_absolute_climate_metric_template(
+        method,
+        time_horizon,
+        emissions,
+        ghg,
+        step_size,
+        mode='valid'
+        ):
+
+    _check_method(method)
+
+    t = np.arange(0, time_horizon+step_size, step_size)
+
+    if len(t) < len(emissions):
+        raise ValueError("Expected time vector to be longer than the emissions vector")
+
+    if method == 'AGWP':
+        absolute_GHG_metric = AGWP(t, ghg)
+
+    elif method == 'AGTP':
+        absolute_GHG_metric = AGTP(t, ghg)
+
+    steps = int(time_horizon/step_size)
+    return _convolve_metric(steps, emissions, absolute_GHG_metric, mode)
+
+
 def _check_method(method):
-    expected_values = ['GWP', 'GTP', 'dynamic_GTP', 'dynamic_GWP']
+    expected_values = [
+        'GWP', 'GTP',
+        'dynamic_AGTP', 'dynamic_AGWP',
+        'AGTP', 'AGWP']
     if method not in expected_values:
         raise ValueError(f'str is not in list of expected values: {expected_values}')
