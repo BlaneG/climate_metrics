@@ -527,26 +527,6 @@ def _climate_metric_template(
         return result[time_horizon * int(1/step_size)]
 
 
-def _dynamic_climate_metric_template(
-        method,
-        time_horizon,
-        net_emissions,
-        ghg,
-        step_size=0.1,
-        mode='valid'
-        ):
-    """This is a generic function for calling dynamic climate metrics for GWP and GTP."""
-    _check_method(method)
-
-    if method == 'dynamic_AGWP':
-        physical_metric = dynamic_AGWP(time_horizon, net_emissions, ghg, step_size, mode)
-        return physical_metric / AGWP_CO2(100)
-
-    elif method == 'dynamic_AGTP':
-        physical_metric = dynamic_AGWP(time_horizon, net_emissions, ghg, step_size, mode)
-        return physical_metric / AGTP_CO2(100)
-
-
 def _dynamic_absolute_climate_metric_template(
         method,
         time_horizon,
