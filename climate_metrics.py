@@ -249,7 +249,7 @@ def AGWP(t, GHG):
         raise NotImplementedError(f'AGWP methods have not been implemented for {GHG}')
 
 
-def dynamic_AGWP(time_horizon, net_emissions, GHG, step_size, mode='valid'):
+def dynamic_AGWP(time_horizon, net_emissions, GHG, step_size, mode='full'):
     """
     """
 
@@ -533,12 +533,12 @@ def _climate_metric_template(
     if method == 'GWP':
         physical_metric = dynamic_AGWP(
             time_horizon, emissions, GHG, step_size, mode='full')
-        result = physical_metric / AGWP_CO2(100)
+        result = physical_metric / AGWP_CO2(time_horizon)
 
     elif method == 'GTP':
-        physical_metric = dynamic_AGWP(
+        physical_metric = dynamic_AGTP(
             time_horizon, emissions, GHG, step_size, mode='full')
-        result = physical_metric / AGTP_CO2(100)
+        result = physical_metric / AGTP_CO2(time_horizon)
 
     if annual:
         return result

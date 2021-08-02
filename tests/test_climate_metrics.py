@@ -13,7 +13,8 @@ from climate_metrics import (
     AGTP_CO2,
     AGWP_N2O,
     AGTP_non_CO2,
-    GWP
+    GWP,
+    GTP
 )
 
 
@@ -159,3 +160,32 @@ GWP_tests = [
 @pytest.mark.parametrize("test_input, expected", GWP_tests)
 def test_GWP(test_input, expected):
     assert_array_almost_equal(GWP(*test_input), expected, decimal=3)
+
+
+GTP_tests1 = [
+    ((100, ONE_FIFTY, 'co2'), 0.57808),
+    ((100, ONE_FIFTY, 'ch4'), 27.90656),
+    ]
+
+@pytest.mark.parametrize("test_input, expected", GTP_tests1)
+def test_GTP(test_input, expected):
+    assert_array_almost_equal(GTP(*test_input), expected, decimal=3)
+
+GTP_tests2 = [
+    ((20, 1, 'co2'), 1),
+    ((20, 1, 'CH4'), 67),
+    ((20, 1, 'n2o'), 277),
+    ((50, 1, 'co2'), 1),
+    ((50, 1, 'CH4'), 14),
+    ((50, 1, 'n2o'), 282),
+    ((100, 1, 'co2'), 1),
+    ((100, 1, 'CH4'), 4),
+    ((100, 1, 'n2o'), 234),
+    ((100, ONE_ZERO, 'CO2'), 1),
+    ((100, ONE_ZERO, 'ch4'), 4),
+    ((100, ONE_ZERO, 'n2o'), 234),
+    ]
+
+@pytest.mark.parametrize("test_input, expected", GTP_tests2)
+def test_GTP(test_input, expected):
+    assert_array_almost_equal(GTP(*test_input), expected, decimal=0)
