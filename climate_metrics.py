@@ -6,21 +6,25 @@ by the International Governmental Panel on Climate Change."""
 import numpy as np
 
 
+#######################
+# Physical models and parameters
+# These are the building blocks for GWP and GTP
+#######################
 # W m–2 ppbv-1
 RADIATIVE_EFFICIENCY_ppbv = {"co2": 1.37e-5, "ch4": 3.63e-4, "n2o": 3.00e-3}
 COEFFICIENT_WEIGHTS = np.array([0.2173, 0.2240, 0.2824, 0.2763])
 TIME_SCALES = np.array([394.4, 36.54, 4.304])
 
 
-def _get_GHG_lifetime(ghg):
+def _get_GHG_lifetime(GHG):
     ghg_lifetimes = dict(
         ch4=12.4,
         n2o=121
     )
-    return ghg_lifetimes[ghg]
+    return ghg_lifetimes[GHG]
 
 
-def _ppbv_to_kg_conversion(ghg):
+def _ppbv_to_kg_conversion(GHG):
     """
     Convert the radiative efficiency from ppbv normalization to kg normalization.
 
@@ -34,16 +38,16 @@ def _ppbv_to_kg_conversion(ghg):
 
     total_mass_atmosphere = 5.1352e18  # kg
     mean_molecular_weight_air = 28.97  # kg per kmol
-    molecular_weight_ghg = molecular_weight[ghg]
+    molecular_weight_ghg = molecular_weight[GHG]
     mass_ratio = mean_molecular_weight_air/molecular_weight_ghg
     return mass_ratio * (1e9/total_mass_atmosphere)
 
 
-def _get_radiative_efficiency_kg(ghg):
+def _get_radiative_efficiency_kg(GHG):
     """Get the radiative efficiency of a GHG in W m–2 kg–1.
     """
-    ppv_to_kg = _ppbv_to_kg_conversion(ghg)
-    return ppv_to_kg * RADIATIVE_EFFICIENCY_ppbv[ghg]
+    ppv_to_kg = _ppbv_to_kg_conversion(GHG)
+    return ppv_to_kg * RADIATIVE_EFFICIENCY_ppbv[GHG]
 
 
 def CO2_irf(time_horizon):
@@ -72,7 +76,7 @@ def CO2_irf(time_horizon):
     )
 
 
-def impulse_response_function(t, ghg):
+def impulse_response_function(t, GHG):
     """The impulse response function for non-CO2/CH4 GHGs.
 
     References
@@ -81,14 +85,14 @@ def impulse_response_function(t, ghg):
     https://www.ipcc.ch/report/ar5/wg1/
     """
     life_time = {"ch4": 12.4, "n2o": 121}
-    if ghg.lower() == "co2":
+    if GHG.lower() == "co2":
         return CO2_irf(t)
     else:
 
-        return np.exp(-t/life_time[ghg.lower()])
+        return np.exp(-t/life_time[GHG.lower()])
 
 
-def radiative_forcing_per_kg(t, ghg):
+def radiative_forcing_per_kg(t, GHG):
     """Computes the radiative forcing at time `t` for a GHG emission at time 0.
 
     Parameters
@@ -96,25 +100,25 @@ def radiative_forcing_per_kg(t, ghg):
     t : array_like
         Time at which radiative forcing is computed.
     """
-    ghg = ghg.lower()
+    GHG = GHG.lower()
 
-    if ghg == 'co2':
-        radiative_efficiency = _get_radiative_efficiency_kg(ghg)
+    if GHG == 'co2':
+        radiative_efficiency = _get_radiative_efficiency_kg(GHG)
 
-    elif ghg == 'ch4':
-        radiative_efficiency = _get_radiative_efficiency_kg(ghg)
+    elif GHG == 'ch4':
+        radiative_efficiency = _get_radiative_efficiency_kg(GHG)
         radiative_efficiency *= _scaled_radiative_efficiency_from_O3_and_H2O()
 
-    elif ghg == 'n2o':
+    elif GHG == 'n2o':
         radiative_efficiency = _N2O_radiative_efficiency_after_methane_adjustment()
 
-    return radiative_efficiency * impulse_response_function(t, ghg)
+    return radiative_efficiency * impulse_response_function(t, GHG)
 
 
 def radiative_forcing_from_emissions_scenario(
         time_horizon,
         emissions,
-        ghg,
+        GHG,
         step_size,
         mode='full'):
     """
@@ -124,7 +128,7 @@ def radiative_forcing_from_emissions_scenario(
         Time period over which radiative forcing is computed for `emissions`.
     emissions : array_like
         GHG emissions (kg) at each time step.
-    ghg : str
+    GHG : str
     step_size : float
         step_size for emissions to create a time index (`t`)
     mode : {'full', 'valid'}, optional
@@ -143,7 +147,7 @@ def radiative_forcing_from_emissions_scenario(
     """
     t = np.arange(0, time_horizon+step_size, step_size)
     assert len(t) >= len(emissions)
-    rf = radiative_forcing_per_kg(t, ghg)
+    rf = radiative_forcing_per_kg(t, GHG)
     steps = int(time_horizon/step_size)
     return _convolve_metric(steps, emissions, rf, mode)
 
@@ -156,6 +160,10 @@ def _convolve_metric(steps, emissions, metric, mode):
     else:
         raise ValueError(f'Received invalid mode value: {mode}')
 
+
+###############################
+# GWP implementation
+###############################
 
 def AGWP_CO2(t):
     radiative_efficiency = _get_radiative_efficiency_kg("co2")
@@ -230,18 +238,18 @@ def AGWP_N2O(t):
     )
 
 
-def AGWP(t, ghg):
-    if ghg.lower() == 'co2':
+def AGWP(t, GHG):
+    if GHG.lower() == 'co2':
         return AGWP_CO2(t)
-    elif ghg.lower() == 'ch4':
+    elif GHG.lower() == 'ch4':
         return AGWP_CH4_no_CO2(t)
-    elif ghg.lower() == 'n2o':
+    elif GHG.lower() == 'n2o':
         return AGWP_N2O(t)
     else:
-        raise NotImplementedError(f'AGWP methods have not been implemented for {ghg}')
+        raise NotImplementedError(f'AGWP methods have not been implemented for {GHG}')
 
 
-def dynamic_AGWP(time_horizon, net_emissions, ghg, step_size, mode='valid'):
+def dynamic_AGWP(time_horizon, net_emissions, GHG, step_size, mode='valid'):
     """
     """
 
@@ -253,14 +261,14 @@ def dynamic_AGWP(time_horizon, net_emissions, ghg, step_size, mode='valid'):
             f"Expected time axis to always be larger than net_emissions \
                 {net_emissions.shape}, {t.shape}.")
 
-    AGWP_GHG = AGWP(t, ghg)
+    AGWP_GHG = AGWP(t, GHG)
     steps = int(time_horizon/step_size)
     return _convolve_metric(steps, net_emissions, AGWP_GHG, mode=mode)
 
 
 def GWP(time_horizon,
         emissions,
-        ghg,
+        GHG,
         step_size=1,
         annual=False):
     """Computes the CO2 equivalent radiative forcing of net_emissions.
@@ -275,7 +283,7 @@ def GWP(time_horizon,
     emissions : int or ndarray
         If emissions is an int, the emission is assumed to 
             occur at time=0.
-    ghg : str {'CO2', 'CH4', 'N2O'}, optional
+    GHG : str {'CO2', 'CH4', 'N2O'}, optional
         Type of GHG emission in `emissions`.
     step_size : float or int
         Step size of `emissions` in years.
@@ -327,10 +335,14 @@ def GWP(time_horizon,
         'GWP',
         time_horizon,
         emissions,
-        ghg,
+        GHG,
         step_size,
         annual)
 
+
+###############################
+# GTP implementation
+###############################
 
 # Short-term and long-term temperature response
 # (Kelvin per (Watt per m2)) to radiative forcing
@@ -377,16 +389,16 @@ def AGTP_CO2(t):
     return radiative_efficiency * temperature_response
 
 
-def AGTP_non_CO2(t, ghg):
-    ghg = ghg.lower()
-    radiative_efficiency = _get_radiative_efficiency_kg(ghg)
-    ghg_lifetime = _get_GHG_lifetime(ghg)
+def AGTP_non_CO2(t, GHG):
+    GHG = GHG.lower()
+    radiative_efficiency = _get_radiative_efficiency_kg(GHG)
+    ghg_lifetime = _get_GHG_lifetime(GHG)
 
     temperature_response = 0
     for i in range(2):
         temporal_weight_linear = ghg_lifetime / (ghg_lifetime - TEMPORAL_WEIGHTS[i])
         temperature_response_coefficient = TEMPERATURE_RESPONSE_COEFFICIENTS[i]
-        irf_GHG = impulse_response_function(t, ghg)
+        irf_GHG = impulse_response_function(t, GHG)
         delayed_temperature_response = np.exp(-t/TEMPORAL_WEIGHTS[i])
         temperature_response += (
             temporal_weight_linear
@@ -394,38 +406,40 @@ def AGTP_non_CO2(t, ghg):
             * (irf_GHG - delayed_temperature_response)
         )
 
-    if ghg.lower() == 'ch4':
+    if GHG.lower() == 'ch4':
         methane_adjustments = _scaled_radiative_efficiency_from_O3_and_H2O()
         return (
             methane_adjustments
             * radiative_efficiency
             * temperature_response
         )
-    elif ghg.lower() == 'n2o':
+    elif GHG.lower() == 'n2o':
         net_radiative_efficiency = _N2O_radiative_efficiency_after_methane_adjustment()
         return net_radiative_efficiency * temperature_response
     else:
         return radiative_efficiency * temperature_response
 
 
-def AGTP(t, ghg):
-    if ghg.lower() == 'co2':
+def AGTP(t, GHG):
+    if GHG.lower() == 'co2':
         return AGTP_CO2(t)
     else:
-        return AGTP_non_CO2(t, ghg)
+        return AGTP_non_CO2(t, GHG)
 
 
-def dynamic_AGTP(time_horizon, emissions, ghg, step_size, mode='valid'):
+def dynamic_AGTP(time_horizon, emissions, GHG, step_size, mode='valid'):
     """
     Global average surface temperature change due to an `emissions` vector.
+
+    `emissions` in kg of `GHG`.
 
     Parameters
     ------------------
     time_horizon : int
         The time over which the temperature response is computed.
-    ghg : str
+    GHG : str
     emissions : ndarray
-        Emissions in kg of a `ghg`.
+        Emissions in kg of a `GHG`.
     step_size : float or int
         The step size used to generate the time axis.
     mode : {'full' or 'valid'}, optional
@@ -445,7 +459,7 @@ def dynamic_AGTP(time_horizon, emissions, ghg, step_size, mode='valid'):
         'AGTP',
         time_horizon,
         emissions,
-        ghg,
+        GHG,
         step_size,
         mode
         )
@@ -453,7 +467,7 @@ def dynamic_AGTP(time_horizon, emissions, ghg, step_size, mode='valid'):
 
 def GTP(time_horizon,
         emissions,
-        ghg,
+        GHG,
         step_size=1,
         annual=False):
     """Compute average global temperature change potential of emissions.
@@ -464,7 +478,7 @@ def GTP(time_horizon,
     emissions : int or ndarray
         If emissions is an int, the emission is assumed to 
             occur at time=0.
-    ghg : str {'CO2', 'CH4', 'N2O'}, optional
+    GHG : str {'CO2', 'CH4', 'N2O'}, optional
         Type of GHG emission in `emissions`.
     step_size : float or int
         Step size of `emissions` in years.
@@ -477,16 +491,19 @@ def GTP(time_horizon,
         'GTP',
         time_horizon,
         emissions,
-        ghg,
+        GHG,
         step_size,
         annual)
 
 
+#############################
+# Generic templates used to construct GWP and GTP
+#############################
 def _climate_metric_template(
         method,
         time_horizon,
         emissions,
-        ghg,
+        GHG,
         step_size=1,
         annual=False):
     """
@@ -498,7 +515,7 @@ def _climate_metric_template(
     emissions : int or ndarray
         If emissions is an int, the emission is assumed to
             occur at time=0.
-    ghg : str {'CO2', 'CH4', 'N2O'}, optional
+    GHG : str {'CO2', 'CH4', 'N2O'}, optional
         Type of GHG emission in `emissions`.
     step_size : float or int
         Step size of `emissions` in years.
@@ -514,11 +531,13 @@ def _climate_metric_template(
         emissions = empty_array
 
     if method == 'GWP':
-        physical_metric = dynamic_AGWP(time_horizon, emissions, ghg, step_size, mode='full')
+        physical_metric = dynamic_AGWP(
+            time_horizon, emissions, GHG, step_size, mode='full')
         result = physical_metric / AGWP_CO2(100)
 
     elif method == 'GTP':
-        physical_metric = dynamic_AGWP(time_horizon, emissions, ghg, step_size, mode='full')
+        physical_metric = dynamic_AGWP(
+            time_horizon, emissions, GHG, step_size, mode='full')
         result = physical_metric / AGTP_CO2(100)
 
     if annual:
@@ -531,7 +550,7 @@ def _dynamic_absolute_climate_metric_template(
         method,
         time_horizon,
         emissions,
-        ghg,
+        GHG,
         step_size,
         mode='valid'
         ):
@@ -544,10 +563,10 @@ def _dynamic_absolute_climate_metric_template(
         raise ValueError("Expected time vector to be longer than the emissions vector")
 
     if method == 'AGWP':
-        absolute_GHG_metric = AGWP(t, ghg)
+        absolute_GHG_metric = AGWP(t, GHG)
 
     elif method == 'AGTP':
-        absolute_GHG_metric = AGTP(t, ghg)
+        absolute_GHG_metric = AGTP(t, GHG)
 
     steps = int(time_horizon/step_size)
     return _convolve_metric(steps, emissions, absolute_GHG_metric, mode)
