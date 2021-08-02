@@ -425,7 +425,7 @@ def AGTP(t, GHG):
 
 def _dynamic_AGTP(time_horizon, emissions, GHG, step_size, mode='valid'):
     """
-    Global average surface temperature change due to an `emissions` vector.
+    Global average surface temperature change at time `time_horizon` from an `emissions` vector.
 
     `emissions` in kg of `GHG`.
 
@@ -445,6 +445,13 @@ def _dynamic_AGTP(time_horizon, emissions, GHG, step_size, mode='valid'):
         'valid':
             This provides the temperature response from the emission vector
             at `time_horizon`.
+
+    Notes
+    -------------
+    Dynamic AGTP is computed using a convolution between the emission vector and `AGTP`:
+
+    .. math:
+        GWP(t) = {\\Delta}T = \\int{_{0}^{TH}E_{GHG}(s)AGTP_{GHG}(t-s)ds}
 
 
     References
@@ -481,6 +488,12 @@ def GTP(time_horizon,
     annual : bool
         If `True`, returns annual GWP over the `time_horizon`. If `False`,
             returns the single value at `time_horizon`.
+
+    Notes
+    ---------------
+
+    References
+    .. [1] IPCC, 2011. https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf
     """
 
     return _climate_metric_template(
