@@ -249,21 +249,17 @@ def AGWP(t, GHG):
         raise NotImplementedError(f'AGWP methods have not been implemented for {GHG}')
 
 
-def dynamic_AGWP(time_horizon, net_emissions, GHG, step_size, mode='full'):
+def _dynamic_AGWP(time_horizon, net_emissions, GHG, step_size, mode='full'):
     """
     """
-
-    t = np.arange(0, time_horizon+step_size, step_size)
-
-    # To compute the convolution over t, net_emissions needs to be as long as t.
-    if len(t) < len(net_emissions):
-        raise ValueError(
-            f"Expected time axis to always be larger than net_emissions \
-                {net_emissions.shape}, {t.shape}.")
-
-    AGWP_GHG = AGWP(t, GHG)
-    steps = int(time_horizon/step_size)
-    return _convolve_metric(steps, net_emissions, AGWP_GHG, mode=mode)
+    return _dynamic_absolute_climate_metric_template(
+        'AGWP',
+        time_horizon,
+        net_emissions,
+        GHG,
+        step_size,
+        mode
+        )
 
 
 def GWP(time_horizon,
@@ -427,7 +423,7 @@ def AGTP(t, GHG):
         return AGTP_non_CO2(t, GHG)
 
 
-def dynamic_AGTP(time_horizon, emissions, GHG, step_size, mode='valid'):
+def _dynamic_AGTP(time_horizon, emissions, GHG, step_size, mode='valid'):
     """
     Global average surface temperature change due to an `emissions` vector.
 
@@ -531,12 +527,12 @@ def _climate_metric_template(
         emissions = empty_array
 
     if method == 'GWP':
-        physical_metric = dynamic_AGWP(
+        physical_metric = _dynamic_AGWP(
             time_horizon, emissions, GHG, step_size, mode='full')
         result = physical_metric / AGWP_CO2(time_horizon)
 
     elif method == 'GTP':
-        physical_metric = dynamic_AGTP(
+        physical_metric = _dynamic_AGTP(
             time_horizon, emissions, GHG, step_size, mode='full')
         result = physical_metric / AGTP_CO2(time_horizon)
 
@@ -575,7 +571,7 @@ def _dynamic_absolute_climate_metric_template(
 def _check_method(method):
     expected_values = [
         'GWP', 'GTP',
-        'dynamic_AGTP', 'dynamic_AGWP',
+        '_dynamic_AGTP', '_dynamic_AGWP',
         'AGTP', 'AGWP']
     if method not in expected_values:
         raise ValueError(f'str is not in list of expected values: {expected_values}')
