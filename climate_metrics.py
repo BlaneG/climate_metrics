@@ -249,6 +249,36 @@ def AGWP(t, GHG):
         raise NotImplementedError(f'AGWP methods have not been implemented for {GHG}')
 
 
+def cumulative_radiative_forcing(
+        time_horizon,
+        emissions,
+        GHG,
+        step_size,
+        annual=False):
+    """Computes the cumulative radiative forcing in reponse to an emission scenario.
+
+    This is a wrapper around _dynamic_AGWP providing a more user-friendly name.
+
+    When `emissions` is a single value, instead of a temporal emission scenario,
+    `temperature_response` returns the same result as `AGWP`.
+
+    Parameters
+    ------------------
+    time_horizon : int
+        The time at which the temperature response is computed.
+    emissions : ndarray
+        Emissions in kg of a `GHG`.
+    GHG : str
+    step_size : float or int
+        The step size used to generate the time axis.
+
+    """
+    if annual:
+        _dynamic_AGWP(time_horizon, emissions, GHG, step_size, mode='full')
+    else:
+        _dynamic_AGWP(time_horizon, emissions, GHG, step_size, mode='full')[0]
+
+
 def _dynamic_AGWP(time_horizon, net_emissions, GHG, step_size, mode='full'):
     """
     """
@@ -423,19 +453,62 @@ def AGTP(t, GHG):
         return AGTP_non_CO2(t, GHG)
 
 
+def temperature_response(
+        time_horizon,
+        emissions,
+        GHG,
+        step_size,
+        annual=False):
+    """Computes the global mean temperature change at in response to an emission scenario.
+
+    This is a wrapper around `_dynamic_AGTP` providing a more user-friendly
+    name.  `dynamic_AGTP` is computed using a convolution between the emission
+    vector and absolute global temperature change potential (`AGTP`):
+
+    .. math:
+        {\\Delta}T = \\int{_{0}^{t}emissions_{GHG_i}(s)AGTP_{GHG_i}(t-s)ds}
+
+    When `emissions` is a single value, instead of a temporal emission scenario,
+    `temperature_response` returns the same result as `AGTP`.
+
+
+    Parameters
+    ------------------
+    time_horizon : int
+        The time at which the temperature response is computed.
+    emissions : ndarray
+        Emissions in kg of a `GHG`.
+    GHG : str
+    step_size : float or int
+        The step size used to generate the time axis.
+
+    Notes
+    -------------
+
+
+    References
+        .. [1] Equation 8.1 in https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf  # noqa: E501
+
+    """
+    if annual:
+        _dynamic_AGTP(time_horizon, emissions, GHG, step_size, mode='full')
+    else:
+        _dynamic_AGTP(time_horizon, emissions, GHG, step_size, mode='full')[0]
+
+
 def _dynamic_AGTP(time_horizon, emissions, GHG, step_size, mode='valid'):
     """
-    Global average surface temperature change at time `time_horizon` from an `emissions` vector.
+    Global average surface temperature change at `time_horizon` due to `emissions`.
 
     `emissions` in kg of `GHG`.
 
     Parameters
     ------------------
     time_horizon : int
-        The time over which the temperature response is computed.
-    GHG : str
+        The time at which the temperature response is computed.
     emissions : ndarray
         Emissions in kg of a `GHG`.
+    GHG : str
     step_size : float or int
         The step size used to generate the time axis.
     mode : {'full' or 'valid'}, optional
@@ -445,17 +518,6 @@ def _dynamic_AGTP(time_horizon, emissions, GHG, step_size, mode='valid'):
         'valid':
             This provides the temperature response from the emission vector
             at `time_horizon`.
-
-    Notes
-    -------------
-    Dynamic AGTP is computed using a convolution between the emission vector and `AGTP`:
-
-    .. math:
-        GWP(t) = {\\Delta}T = \\int{_{0}^{TH}E_{GHG}(s)AGTP_{GHG}(t-s)ds}
-
-
-    References
-        .. [1] Equation 8.1 in https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf  # noqa: E501
     """
 
     return _dynamic_absolute_climate_metric_template(
@@ -493,7 +555,7 @@ def GTP(time_horizon,
     ---------------
 
     References
-    .. [1] IPCC, 2011. https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf
+    .. [1] IPCC, 2011. https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf  # noqa: E501
     """
 
     return _climate_metric_template(
