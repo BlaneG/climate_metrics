@@ -3,5 +3,6 @@ numpy
 pytest
 scipy
 nbval
+flake8
 
 
