@@ -102,8 +102,8 @@ def test_dynamic_GWP():
 
     # Third test, continuous emission pulse
     t = np.arange(0, time_horizon+time_step, time_step)
-    # We need to weight emissions by `time_step` because 
-    # uniform creates a 0.1 annual emission at 0.1 
+    # We need to weight emissions by `time_step` because
+    # uniform creates a 0.1 annual emission at 0.1
     # time_steps (sum(emissions) would be '10' instead of the
     # expected '1'). However when we do the integration below
     # in the test, we don't need the weighting because this
@@ -167,9 +167,11 @@ GTP_tests1 = [
     ((100, ONE_FIFTY, 'ch4'), 27.90656),
     ]
 
+
 @pytest.mark.parametrize("test_input, expected", GTP_tests1)
 def test_GTP(test_input, expected):
     assert_array_almost_equal(GTP(*test_input), expected, decimal=3)
+
 
 GTP_tests2 = [
     ((20, 1, 'co2'), 1),
@@ -186,6 +188,8 @@ GTP_tests2 = [
     ((100, ONE_ZERO, 'n2o'), 234),
     ]
 
+
 @pytest.mark.parametrize("test_input, expected", GTP_tests2)
-def test_GTP(test_input, expected):
+def test_GTP_no_decimal(test_input, expected):
+    """IPCC values are rounded to the nearest whole number"""
     assert_array_almost_equal(GTP(*test_input), expected, decimal=0)

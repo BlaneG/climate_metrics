@@ -309,7 +309,7 @@ def GWP(time_horizon,
     ---------------
     time_horizon : int
     emissions : int or ndarray
-        If emissions is an int, the emission is assumed to 
+        If emissions is an int, the emission is assumed to
             occur at time=0.
     GHG : str {'CO2', 'CH4', 'N2O'}, optional
         Type of GHG emission in `emissions`.
@@ -545,7 +545,7 @@ def GTP(time_horizon,
     -----------
     time_horizon : int
     emissions : int or ndarray
-        If emissions is an int, the emission is assumed to 
+        If emissions is an int, the emission is assumed to
             occur at time=0.
     GHG : str {'CO2', 'CH4', 'N2O'}, optional
         Type of GHG emission in `emissions`.
