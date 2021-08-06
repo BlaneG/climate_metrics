@@ -274,9 +274,11 @@ def cumulative_radiative_forcing(
 
     """
     if annual:
-        _dynamic_AGWP(time_horizon, emissions, GHG, step_size, mode='full')
+        return _dynamic_AGWP(
+            time_horizon, emissions, GHG, step_size, mode='full')
     else:
-        _dynamic_AGWP(time_horizon, emissions, GHG, step_size, mode='full')[0]
+        return _dynamic_AGWP(
+            time_horizon, emissions, GHG, step_size, mode='full')[0]
 
 
 def _dynamic_AGWP(time_horizon, net_emissions, GHG, step_size, mode='full'):
@@ -491,9 +493,11 @@ def temperature_response(
 
     """
     if annual:
-        _dynamic_AGTP(time_horizon, emissions, GHG, step_size, mode='full')
+        return _dynamic_AGTP(
+            time_horizon, emissions, GHG, step_size, mode='full')
     else:
-        _dynamic_AGTP(time_horizon, emissions, GHG, step_size, mode='full')[0]
+        return _dynamic_AGTP(
+            time_horizon, emissions, GHG, step_size, mode='full')[0]
 
 
 def _dynamic_AGTP(time_horizon, emissions, GHG, step_size, mode='valid'):
