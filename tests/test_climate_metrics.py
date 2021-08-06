@@ -163,8 +163,8 @@ def test_GWP(test_input, expected):
 
 
 GTP_tests1 = [
-    ((100, ONE_FIFTY, 'co2'), 0.57808),
-    ((100, ONE_FIFTY, 'ch4'), 27.90656),
+    ((100, ONE_FIFTY, 'co2'), 1.1276),
+    ((100, ONE_FIFTY, 'ch4'), 15.8396),
     ]
 
 
