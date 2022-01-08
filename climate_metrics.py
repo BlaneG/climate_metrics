@@ -149,14 +149,14 @@ def radiative_forcing_from_emissions_scenario(
     assert len(t) >= len(emissions)
     rf = radiative_forcing_per_kg(t, GHG)
     steps = int(time_horizon/step_size)
-    return _convolve_metric(steps, emissions, rf, mode)
+    return _convolve_metric(steps, step_size, emissions, rf, mode)
 
 
-def _convolve_metric(steps, emissions, metric, mode):
+def _convolve_metric(steps, step_size, emissions, metric, mode):
     if mode == 'full':
-        return np.convolve(emissions, metric, mode=mode)[0:steps+1]
+        return np.convolve(emissions, metric, mode=mode)[0:steps+1] * step_size
     elif mode == 'valid':
-        return np.convolve(emissions, metric, mode=mode)
+        return np.convolve(emissions, metric, mode=mode) * step_size
     else:
         raise ValueError(f'Received invalid mode value: {mode}')
 
@@ -600,8 +600,9 @@ def _climate_metric_template(
     """
     _check_method(method)
 
-    if type(emissions) is int:
-        empty_array = np.zeros(time_horizon+step_size)
+    if type(emissions) is int or type(emissions) is float:
+        t = np.arange(0, time_horizon+step_size, step_size)
+        empty_array = np.zeros(len(t))
         empty_array[0] = emissions
         emissions = empty_array
 
@@ -644,7 +645,7 @@ def _dynamic_absolute_climate_metric_template(
         absolute_GHG_metric = AGTP(t, GHG)
 
     steps = int(time_horizon/step_size)
-    return _convolve_metric(steps, emissions, absolute_GHG_metric, mode)
+    return _convolve_metric(steps, step_size, emissions, absolute_GHG_metric, mode)
 
 
 def _check_method(method):
