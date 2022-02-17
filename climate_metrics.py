@@ -96,7 +96,7 @@ def radiative_forcing_per_kg(t, GHG):
     """Computes the radiative forcing at time `t` for a GHG emission at time 0.
 
     Parameters
-    --------------
+    ----------
     t : array_like
         Time at which radiative forcing is computed.
     """
@@ -122,8 +122,10 @@ def radiative_forcing_from_emissions_scenario(
         step_size,
         mode='full'):
     """
+    Radiative forcing (:math:`Wm^{-2}`) caused by `emissions`.
+
     Parameters
-    ---------------
+    ----------
     time_horizon : int
         Time period over which radiative forcing is computed for `emissions`.
     emissions : array_like
@@ -132,18 +134,17 @@ def radiative_forcing_from_emissions_scenario(
     step_size : float
         step_size for emissions to create a time index (`t`)
     mode : {'full', 'valid'}, optional
-        mode passed to np.convolve.
         'full':
-            Use full to get the temporal change in radiative forcing
-            from 0-`time_horizon`.
-            Output shape is `len(time_horizon) + len(emissions) + 1`.
+          Use full to get the temporal change in radiative forcing
+          from 0-`time_horizon`. Output shape is: `len(time_horizon)
+          + len(emissions) + 1`.
         'same':
-            Use to get the radiative forcing at `time_horizon`.
-            Output shape is `max(len(time_horizon), len(emissions))`.
+          Use to get the radiative forcing at `time_horizon`.
+          Output shape is: `max(len(time_horizon), len(emissions))`.
 
     Returns
-    ---------------
-    ndarray
+    -------
+    np.ndarray
     """
     t = np.arange(0, time_horizon+step_size, step_size)
     assert len(t) >= len(emissions)
@@ -299,29 +300,27 @@ def GWP(time_horizon,
         GHG,
         step_size=1,
         annual=False):
-    """Computes the CO2 equivalent radiative forcing of net_emissions.
+    """Computes the CO2 equivalent radiative forcing of `emissions`.
 
     Can be used to compute GWP over `time_horizon` of a single pulse emission,
-    or a flow of emissions over time (referred to variously in the literature
-    as tonne-year [1]_, [2]_, [3]_, GWP [4]_, and GWP_bio [5]_).
+    or a flow of emissions over time.
 
     Parameters
-    ---------------
+    ----------
     time_horizon : int
     emissions : int or ndarray
         If emissions is an int, the emission is assumed to
-            occur at time=0.
+        occur at time=0.
     GHG : str {'CO2', 'CH4', 'N2O'}, optional
         Type of GHG emission in `emissions`.
     step_size : float or int
         Step size of `emissions` in years.
     annual : bool
         If `True`, returns annual GWP over the `time_horizon`. If `False`,
-            returns the single value at `time_horizon`.
-
+        returns the single value at `time_horizon`.
 
     Notes
-    ------------
+    -----
     If step_size < 1, the sum of the net_emissions vector must be equal
     to total emissions. So if a probability density function were used
     to simulate net_emissions over time, net_emissions would first have
@@ -331,30 +330,29 @@ def GWP(time_horizon,
     of :math:`GHG_x` emitted in year = 0 over a given time-horizon
     (:math:`t`):
 
-    .. math:
-        GWP(t) = \\frac{cumulativeRadiativeForcingGHG\\_x(t)}
-                    {cumulativeRadiativeForcing\\_CO2(t)}
+    .. math::
+        GWP(t) = \\frac{cumulativeRadiativeForcingGHG_x(t)}
+                    {cumulativeRadiativeForcingCO_2(t)}
 
-    Dynamic GWP ([1]_, [2]_ [3]_, [4]_) computes the cumulative radiative forcing
-    of annual (:math:`t'`) emissions ():math:`GHG_x`) over a give time-horizon
+    Dynamic GWP (variously referred to in the literature as tonne-year ([1]_, [2]_,
+    [3]_), GWP ([4]_), and GWP_bio ([5]_)) computes the cumulative radiative forcing
+    of annual (:math:`t'`) emissions (:math:`GHG_x`) over a give time-horizon
     (:math:`t`):
 
-    .. math:
-        dynamicGWP_x(t, t')
-                    = {\\mathbf{emission_x}(t')}\\cdot{\\mathbf{GWP_x}(t-t')}
-                    = \\sum_{t'}{\\mathbf{emission_x}(t'){\\mathbf{GWP_x}(t-t')}}
-                    = \frac{
-                    \\sum_{t'}{cumulativeRadiativeForcingGHG_x(t-t')}}
-                    {cumulativeRadiativeForcing_{CO2}(t)}
-
+    .. math::
+        \\begin{eqnarray}
+        dynamicGWP_x(t, t') & = & {\\mathbf{emission_x}(t')}\\cdot{\\mathbf{GWP_x}(t-t')} \\\\
+                            & = & \\sum_{t'}{\\mathbf{emission_x}(t') * {\\mathbf{GWP_x}(t-t')}} \\\\
+                            & = & \\frac{\\sum_{t'}{cumulativeRadiativeForcingGHG_x(t-t')}}
+                                {cumulativeRadiativeForcing_{CO2}(t)}
+        \\end{eqnarray}
 
     References
-    --------------
-
+    ----------
     .. [1] IPCC, 2000.  https://archive.ipcc.ch/ipccreports/sres/land_use/index.php?idp=74  # noqa: E501
     .. [2] Fearnside et al. 2000.  https://link.springer.com/article/10.1023/A:1009625122628  # noqa: E501
     .. [3] Moura Costa et al. 2000.  https://link.springer.com/article/10.1023/A:1009697625521  # noqa: E501
-    .. [4] Levassuer et al. 2010.  https://pubs.acs.org/doi/10.1021/es9030003
+    .. [4] Levasseur et al. 2010.  https://pubs.acs.org/doi/10.1021/es9030003
     .. [5] Cherubini et al. 2011.  https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1757-1707.2011.01102.x  # noqa: E501
 
 
@@ -381,10 +379,12 @@ TEMPORAL_WEIGHTS = [8.4, 409.5]
 
 def AGTP_CO2(t):
     """
+    The absolute global temperature change potential of :math:`CO_2` at time `t`.
 
     References
-    ------------
-    1. 8.SM.15 in https://www.ipcc.ch/site/assets/uploads/2018/07/WGI_AR5.Chap_.8_SM.pdf
+    ----------
+    see equation 8.SM.15 in Myhre et al., 2013. Anthropogenic and Natural Radiative
+      Forcing: Supplementary Material. 
     """
     radiative_efficiency = _get_radiative_efficiency_kg("co2")
 
@@ -475,7 +475,7 @@ def temperature_response(
 
 
     Parameters
-    ------------------
+    ----------
     time_horizon : int
         The time at which the temperature response is computed.
     emissions : ndarray
@@ -484,12 +484,10 @@ def temperature_response(
     step_size : float or int
         The step size used to generate the time axis.
 
-    Notes
-    -------------
-
 
     References
-        .. [1] Equation 8.1 in https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf  # noqa: E501
+    ----------
+    .. [1] Equation 8.1 in https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf  # noqa: E501
 
     """
     if annual:
@@ -517,11 +515,11 @@ def _dynamic_AGTP(time_horizon, emissions, GHG, step_size, mode='valid'):
         The step size used to generate the time axis.
     mode : {'full' or 'valid'}, optional
         'full':
-            This provides the full temporal profile of the temperature response
-            over the time 0-time_horizon.
+          This provides the full temporal profile of the temperature response
+          over the time 0-time_horizon.
         'valid':
-            This provides the temperature response from the emission vector
-            at `time_horizon`.
+          This provides the temperature response from the emission vector
+          at `time_horizon`.
     """
 
     return _dynamic_absolute_climate_metric_template(
@@ -546,19 +544,17 @@ def GTP(time_horizon,
     time_horizon : int
     emissions : int or ndarray
         If emissions is an int, the emission is assumed to
-            occur at time=0.
+        occur at time=0.
     GHG : str {'CO2', 'CH4', 'N2O'}, optional
         Type of GHG emission in `emissions`.
     step_size : float or int
         Step size of `emissions` in years.
     annual : bool
-        If `True`, returns annual GWP over the `time_horizon`. If `False`,
-            returns the single value at `time_horizon`.
-
-    Notes
-    ---------------
+        If `True`, returns annual GTP over the `time_horizon`. If `False`,
+        returns the single value at `time_horizon`.
 
     References
+    ----------
     .. [1] IPCC, 2011. https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf  # noqa: E501
     """
 
@@ -589,14 +585,14 @@ def _climate_metric_template(
     time_horizon : int
     emissions : int or ndarray
         If emissions is an int, the emission is assumed to
-            occur at time=0.
+        occur at time=0.
     GHG : str {'CO2', 'CH4', 'N2O'}, optional
         Type of GHG emission in `emissions`.
     step_size : float or int
         Step size of `emissions` in years.
     annual : bool
         If `True`, returns annual GWP over the `time_horizon`. If `False`,
-            returns the single value at `time_horizon`.
+        returns the single value at `time_horizon`.
     """
     _check_method(method)
 
