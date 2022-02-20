@@ -463,9 +463,8 @@ def temperature_response(
         annual=False):
     """Computes the global mean temperature change at in response to an emission scenario.
 
-    This is a wrapper around `_dynamic_AGTP` providing a more user-friendly
-    name.  `dynamic_AGTP` is computed using a convolution between the emission
-    vector and absolute global temperature change potential (`AGTP`):
+    The `temperature_response` is computed using a convolution of emissions
+    and absolute global temperature change potential (`AGTP`):
 
     .. math:
         {\\Delta}T = \\int{_{0}^{t}emissions_{GHG_i}(s)AGTP_{GHG_i}(t-s)ds}
