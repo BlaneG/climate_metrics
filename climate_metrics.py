@@ -54,7 +54,7 @@ def CO2_irf(time_horizon):
     """The impulse response function of CO2.
 
     Parameters
-    -----------
+    ----------
     time_horizon : int
         The time since the original CO2 emission occurred.
 
@@ -190,7 +190,7 @@ def _scaled_radiative_efficiency_from_O3_and_H2O():
 def AGWP_CH4_no_CO2(t):
     """
     Parameters
-    -----------
+    ----------
     t : int
 
     Note
@@ -264,7 +264,7 @@ def cumulative_radiative_forcing(
     `temperature_response` returns the same result as `AGWP`.
 
     Parameters
-    ------------------
+    ----------
     time_horizon : int
         The time at which the temperature response is computed.
     emissions : ndarray
@@ -504,7 +504,7 @@ def _dynamic_AGTP(time_horizon, emissions, GHG, step_size, mode='valid'):
     `emissions` in kg of `GHG`.
 
     Parameters
-    ------------------
+    ----------
     time_horizon : int
         The time at which the temperature response is computed.
     emissions : ndarray
@@ -539,7 +539,7 @@ def GTP(time_horizon,
     """Compute average global temperature change potential of emissions.
 
     Parameters
-    -----------
+    ----------
     time_horizon : int
     emissions : int or ndarray
         If emissions is an int, the emission is assumed to
@@ -579,7 +579,7 @@ def _climate_metric_template(
     """
 
     Parameters
-    -----------
+    ----------
     method : str {'GWP', 'GTP'}
     time_horizon : int
     emissions : int or ndarray
