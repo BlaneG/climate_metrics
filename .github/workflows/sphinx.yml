@@ -16,6 +16,8 @@ jobs:
       with:
         name: html-docs
         path: docs/_build/html/
+        name: climate-metrics
+        path: climate_metrics.py
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
       if: github.ref == 'refs/heads/main'
