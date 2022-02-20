@@ -1,0 +1,6 @@
+﻿climate\_metrics.cumulative\_radiative\_forcing
+===============================================
+
+.. currentmodule:: climate_metrics
+
+.. autofunction:: cumulative_radiative_forcing

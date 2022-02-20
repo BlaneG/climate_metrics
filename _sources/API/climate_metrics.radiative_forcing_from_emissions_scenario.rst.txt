@@ -1,0 +1,6 @@
+﻿climate\_metrics.radiative\_forcing\_from\_emissions\_scenario
+==============================================================
+
+.. currentmodule:: climate_metrics
+
+.. autofunction:: radiative_forcing_from_emissions_scenario

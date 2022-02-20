@@ -1,0 +1,6 @@
+﻿climate\_metrics.GWP
+====================
+
+.. currentmodule:: climate_metrics
+
+.. autofunction:: GWP

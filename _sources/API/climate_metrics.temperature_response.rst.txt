@@ -1,0 +1,6 @@
+﻿climate\_metrics.temperature\_response
+======================================
+
+.. currentmodule:: climate_metrics
+
+.. autofunction:: temperature_response
