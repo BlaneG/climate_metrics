@@ -1,3 +1,5 @@
+# a requirement for deploying to github pages
+# https://www.sphinx-doc.org/en/master/tutorial/deploying.html#publishing-your-html-documentation
 furo==2021.11.16
 numpydoc
 pydata-sphinx-theme
