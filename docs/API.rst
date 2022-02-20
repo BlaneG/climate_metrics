@@ -3,10 +3,9 @@ API reference
 .. so we don't need to specify the module in the toctree below
 .. currentmodule:: climate_metrics
 
-
+.. Use the autosummary as a toctree entree and save the outputs
+   in the API directory.
 .. autosummary::
-   .. Use the autosummary as a toctree entree and save the outputs
-      in the API directory.
    :toctree: API/
 
    radiative_forcing_from_emissions_scenario
