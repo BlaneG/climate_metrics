@@ -1,0 +1,4 @@
+furo==2021.11.16
+numpydoc
+pydata-sphinx-theme
+sphinx
