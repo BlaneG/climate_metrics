@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>How to compute climate metrics from annual emissions &#8212; climate metrics 2022.1.0 documentation</title>
+    <title>Visually exploring the building blocks of climate metrics &#8212; climate metrics 2022.1.0 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -38,6 +38,7 @@
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Explanation" href="../Explanation.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -84,6 +85,12 @@
  </a>
 </li>
 
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../Explanation.html">
+  Explanation
+ </a>
+</li>
+
     
 </ul>
       </div>
@@ -114,7 +121,19 @@
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
   <div class="bd-toc-item active">
-    
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Contents:
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Visually exploring the building blocks of climate metrics
+  </a>
+ </li>
+</ul>
+
   </div>
 </nav>
               </div>
@@ -136,24 +155,17 @@
 
 <nav id="bd-toc-nav">
     <ul class="visible nav section-nav flex-column">
- <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#">
-   How to compute climate metrics from annual emissions
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#visualizing-atmospheric-lifetimes">
+   Visualizing atmospheric lifetimes
   </a>
-  <ul class="visible nav section-nav flex-column">
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#visualizing-atmospheric-lifetimes">
-     Visualizing atmospheric lifetimes
-    </a>
-   </li>
-  </ul>
  </li>
- <li class="toc-h1 nav-item toc-entry">
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#absolute-global-warming-potential">
    Absolute global warming potential
   </a>
  </li>
- <li class="toc-h1 nav-item toc-entry">
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#global-warming-potential">
    Global Warming Potential
   </a>
@@ -179,8 +191,8 @@
               
               <div>
                 
-  <section id="how-to-compute-climate-metrics-from-annual-emissions">
-<h1>How to compute climate metrics from annual emissions<a class="headerlink" href="#how-to-compute-climate-metrics-from-annual-emissions" title="Permalink to this headline">#</a></h1>
+  <section id="visually-exploring-the-building-blocks-of-climate-metrics">
+<h1>Visually exploring the building blocks of climate metrics<a class="headerlink" href="#visually-exploring-the-building-blocks-of-climate-metrics" title="Permalink to this headline">#</a></h1>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
@@ -189,22 +201,9 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">quad</span><span class="p">,</span> <span class="n">trapz</span>
 
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">)</span>  <span class="c1"># provide access to the root folder for local development</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;../..&#39;</span><span class="p">)</span>  <span class="c1"># provide access to the root folder for local development</span>
 <span class="kn">from</span> <span class="nn">climate_metrics</span> <span class="kn">import</span> <span class="n">impulse_response_function</span><span class="p">,</span> <span class="n">_get_radiative_efficiency_kg</span>
 <span class="kn">from</span> <span class="nn">climate_metrics</span> <span class="kn">import</span> <span class="n">AGWP_CO2</span><span class="p">,</span> <span class="n">AGWP_CH4_no_CO2</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
-<span class="nn">Input In [1],</span> in <span class="ni">&lt;cell line: 8&gt;</span><span class="nt">()</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">quad</span><span class="p">,</span> <span class="n">trapz</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">)</span>  <span class="c1"># provide access to the root folder for local development</span>
-<span class="ne">----&gt; </span><span class="mi">8</span> <span class="kn">from</span> <span class="nn">climate_metrics</span> <span class="kn">import</span> <span class="n">impulse_response_function</span><span class="p">,</span> <span class="n">_get_radiative_efficiency_kg</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="kn">from</span> <span class="nn">climate_metrics</span> <span class="kn">import</span> <span class="n">AGWP_CO2</span><span class="p">,</span> <span class="n">AGWP_CH4_no_CO2</span>
-
-<span class="ne">ModuleNotFoundError</span>: No module named &#39;climate_metrics&#39;
 </pre></div>
 </div>
 </div>
@@ -241,13 +240,12 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/4abd581ec1bdb28554ca23ab4e1d1e191542f4cc7da20163620375c5553ceb0d.png" src="../_images/4abd581ec1bdb28554ca23ab4e1d1e191542f4cc7da20163620375c5553ceb0d.png" />
+<img alt="../_images/e332c941f74bd7a308132ab1ea5eebcd8f67247202cfcf813f8a720e68746411.png" src="../_images/e332c941f74bd7a308132ab1ea5eebcd8f67247202cfcf813f8a720e68746411.png" />
 </div>
 </div>
-</section>
 </section>
 <section id="absolute-global-warming-potential">
-<h1>Absolute global warming potential<a class="headerlink" href="#absolute-global-warming-potential" title="Permalink to this headline">#</a></h1>
+<h2>Absolute global warming potential<a class="headerlink" href="#absolute-global-warming-potential" title="Permalink to this headline">#</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">AGWP_CH4_result</span> <span class="o">=</span> <span class="n">AGWP_CH4_no_CO2</span><span class="p">(</span><span class="n">time_axis</span><span class="p">)</span>
@@ -293,12 +291,12 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/9177788f4a81446dc17a5031523696a7719b6626aefdd8da8a9fcf1cedaff5cd.png" src="../_images/9177788f4a81446dc17a5031523696a7719b6626aefdd8da8a9fcf1cedaff5cd.png" />
+<img alt="../_images/168a84c7af760dcf544a33687149d75151a846dd43f102f2f97e8731b479bdd4.png" src="../_images/168a84c7af760dcf544a33687149d75151a846dd43f102f2f97e8731b479bdd4.png" />
 </div>
 </div>
 </section>
 <section id="global-warming-potential">
-<h1>Global Warming Potential<a class="headerlink" href="#global-warming-potential" title="Permalink to this headline">#</a></h1>
+<h2>Global Warming Potential<a class="headerlink" href="#global-warming-potential" title="Permalink to this headline">#</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ignore the divide by zero error at time = 0</span>
@@ -347,9 +345,10 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/e496db86452ba50bc61ebf05f3f19432361c91414fb518fe2e33c219de753f00.png" src="../_images/e496db86452ba50bc61ebf05f3f19432361c91414fb518fe2e33c219de753f00.png" />
+<img alt="../_images/a531b561e9b27b1967f6fac27a2ffc6e978539f757dea1c7007dfdcb8cd85c09.png" src="../_images/a531b561e9b27b1967f6fac27a2ffc6e978539f757dea1c7007dfdcb8cd85c09.png" />
 </div>
 </div>
+</section>
 </section>
 
 
@@ -358,6 +357,13 @@
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="../Explanation.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Explanation</p>
+        </div>
+    </a>
 </div>
               
           </main>
