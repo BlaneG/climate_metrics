@@ -24,6 +24,7 @@ Installation
    :caption: Contents:
    
    API
+   How-to
 
 
 
