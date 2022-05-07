@@ -32,7 +32,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=90 --statistics
     - name: Test notebooks
       run: |
-        pytest --nbval docs/notebooks
+        pytest --nbval-lax docs/notebooks
     - name: Tests
       run: |
         python -m pytest
