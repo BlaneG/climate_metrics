@@ -1,8 +1,9 @@
+flake8
+jupyterlab
 matplotlib
+nbval
 numpy
 pytest
 scipy
-nbval
-flake8
 
 
