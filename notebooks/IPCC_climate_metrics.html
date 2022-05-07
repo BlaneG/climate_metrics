@@ -1,0 +1,389 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>How to compute climate metrics from annual emissions &#8212; climate metrics 2022.1.0 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../index.html">
+<p class="title">climate metrics</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../API.html">
+  API reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../How-to.html">
+  How-to
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   How to compute climate metrics from annual emissions
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#visualizing-atmospheric-lifetimes">
+     Visualizing atmospheric lifetimes
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#absolute-global-warming-potential">
+   Absolute global warming potential
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#global-warming-potential">
+   Global Warming Potential
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <section id="how-to-compute-climate-metrics-from-annual-emissions">
+<h1>How to compute climate metrics from annual emissions<a class="headerlink" href="#how-to-compute-climate-metrics-from-annual-emissions" title="Permalink to this headline">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">quad</span><span class="p">,</span> <span class="n">trapz</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">)</span>  <span class="c1"># provide access to the root folder for local development</span>
+<span class="kn">from</span> <span class="nn">climate_metrics</span> <span class="kn">import</span> <span class="n">impulse_response_function</span><span class="p">,</span> <span class="n">_get_radiative_efficiency_kg</span>
+<span class="kn">from</span> <span class="nn">climate_metrics</span> <span class="kn">import</span> <span class="n">AGWP_CO2</span><span class="p">,</span> <span class="n">AGWP_CH4_no_CO2</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="nn">Input In [1],</span> in <span class="ni">&lt;cell line: 3&gt;</span><span class="nt">()</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">sys</span>
+<span class="ne">----&gt; </span><span class="mi">3</span> <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">quad</span><span class="p">,</span> <span class="n">trapz</span>
+
+<span class="ne">ModuleNotFoundError</span>: No module named &#39;matplotlib&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">time_horizon</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">time_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">time_horizon</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="visualizing-atmospheric-lifetimes">
+<h2>Visualizing atmospheric lifetimes<a class="headerlink" href="#visualizing-atmospheric-lifetimes" title="Permalink to this headline">#</a></h2>
+<p>Each greenhouse has an atmospheric lifetime.  Atmospheric lifetimes are affected by physical and chemical processes that transfer gases out of the atmosphere.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">time_axis</span><span class="p">,</span>
+    <span class="n">impulse_response_function</span><span class="p">(</span><span class="n">time_axis</span><span class="p">,</span> <span class="s2">&quot;CH4&quot;</span><span class="p">),</span>
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;CH$_4$&#39;</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">time_axis</span><span class="p">,</span>
+    <span class="n">impulse_response_function</span><span class="p">(</span><span class="n">time_axis</span><span class="p">,</span> <span class="s2">&quot;CO2&quot;</span><span class="p">),</span>
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;CO$_2$&#39;</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;atmospheric fraction&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;time (years)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;atmospheric lifetime&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/4abd581ec1bdb28554ca23ab4e1d1e191542f4cc7da20163620375c5553ceb0d.png" src="../_images/4abd581ec1bdb28554ca23ab4e1d1e191542f4cc7da20163620375c5553ceb0d.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="absolute-global-warming-potential">
+<h1>Absolute global warming potential<a class="headerlink" href="#absolute-global-warming-potential" title="Permalink to this headline">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">AGWP_CH4_result</span> <span class="o">=</span> <span class="n">AGWP_CH4_no_CO2</span><span class="p">(</span><span class="n">time_axis</span><span class="p">)</span>
+<span class="n">AGWP_CO2_result</span> <span class="o">=</span> <span class="n">AGWP_CO2</span><span class="p">(</span><span class="n">time_axis</span><span class="p">)</span>
+
+<span class="c1"># text annotation</span>
+<span class="n">AGWP_text</span> <span class="o">=</span> <span class="s1">&#39;AGWP$_</span><span class="si">{100}</span><span class="s1">$&#39;</span>
+<span class="n">xy_CO2</span> <span class="o">=</span> <span class="p">(</span><span class="n">time_axis</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span> <span class="n">AGWP_CO2_result</span><span class="p">[</span><span class="mi">100</span><span class="p">])</span>
+<span class="n">xy_CH4</span> <span class="o">=</span> <span class="p">(</span><span class="n">time_axis</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span> <span class="n">AGWP_CH4_result</span><span class="p">[</span><span class="mi">100</span><span class="p">])</span>
+<span class="n">xy_text</span> <span class="o">=</span> <span class="p">(</span><span class="n">time_axis</span><span class="p">[</span><span class="mi">100</span><span class="p">]</span><span class="o">*</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">AGWP_CH4_result</span><span class="p">[</span><span class="mi">100</span><span class="p">]</span><span class="o">*</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">time_axis</span><span class="p">,</span>
+    <span class="n">AGWP_CH4_result</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;CH$_4$&#39;</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">time_axis</span><span class="p">,</span>
+    <span class="n">AGWP_CO2_result</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;CO$_2$&#39;</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;AGWP (W m$^{–2}$ ppbv$^{-1}$)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;time (years)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span>
+    <span class="s1">&#39;Absolute global warming potential for different time horizons&#39;</span><span class="p">,</span>
+    <span class="n">size</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+    <span class="n">y</span><span class="o">=</span><span class="mf">1.05</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+    <span class="n">AGWP_text</span><span class="p">,</span>
+    <span class="n">xy</span><span class="o">=</span><span class="n">xy_CO2</span><span class="p">,</span>
+    <span class="n">xytext</span><span class="o">=</span><span class="n">xy_text</span> <span class="p">,</span>
+    <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s1">&#39;-&gt;&#39;</span><span class="p">,</span><span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+    <span class="n">AGWP_text</span><span class="p">,</span>
+    <span class="n">xy</span><span class="o">=</span><span class="n">xy_CH4</span><span class="p">,</span>
+    <span class="n">xytext</span><span class="o">=</span><span class="n">xy_text</span> <span class="p">,</span>
+    <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s1">&#39;-&gt;&#39;</span><span class="p">,</span><span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/9177788f4a81446dc17a5031523696a7719b6626aefdd8da8a9fcf1cedaff5cd.png" src="../_images/9177788f4a81446dc17a5031523696a7719b6626aefdd8da8a9fcf1cedaff5cd.png" />
+</div>
+</div>
+</section>
+<section id="global-warming-potential">
+<h1>Global Warming Potential<a class="headerlink" href="#global-warming-potential" title="Permalink to this headline">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ignore the divide by zero error at time = 0</span>
+<span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+
+<span class="n">GWP_CH4</span> <span class="o">=</span> <span class="n">AGWP_CH4_result</span><span class="o">/</span><span class="n">AGWP_CO2_result</span>
+<span class="n">GWP_CO2</span> <span class="o">=</span> <span class="n">AGWP_CO2_result</span><span class="o">/</span><span class="n">AGWP_CO2_result</span>
+
+<span class="c1"># text annotation</span>
+<span class="n">GWP_text</span> <span class="o">=</span> <span class="s1">&#39;GWP$_</span><span class="si">{100}</span><span class="s1">$&#39;</span>
+<span class="n">xy_CO2</span> <span class="o">=</span> <span class="p">(</span><span class="n">time_axis</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span> <span class="n">GWP_CO2</span><span class="p">[</span><span class="mi">100</span><span class="p">])</span>
+<span class="n">xy_CH4</span> <span class="o">=</span> <span class="p">(</span><span class="n">time_axis</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span> <span class="n">GWP_CH4</span><span class="p">[</span><span class="mi">100</span><span class="p">])</span>
+<span class="n">xy_text</span> <span class="o">=</span> <span class="p">(</span><span class="n">time_axis</span><span class="p">[</span><span class="mi">100</span><span class="p">]</span><span class="o">*</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">GWP_CH4</span><span class="p">[</span><span class="mi">100</span><span class="p">]</span><span class="o">*</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">time_axis</span><span class="p">,</span>
+    <span class="n">AGWP_CH4_result</span><span class="o">/</span><span class="n">AGWP_CO2_result</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;CH$_4$&#39;</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">time_axis</span><span class="p">,</span>
+    <span class="n">AGWP_CO2_result</span><span class="o">/</span><span class="n">AGWP_CO2_result</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;CO$_2$&#39;</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;GWP (kg CO2eq)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;time (years)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span>
+    <span class="s1">&#39;Absolute global warming potential for different time horizons&#39;</span><span class="p">,</span>
+    <span class="n">size</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+    <span class="n">y</span><span class="o">=</span><span class="mf">1.05</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+    <span class="n">GWP_text</span><span class="p">,</span>
+    <span class="n">xy</span><span class="o">=</span><span class="n">xy_CO2</span><span class="p">,</span>
+    <span class="n">xytext</span><span class="o">=</span><span class="n">xy_text</span><span class="p">,</span>
+    <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s1">&#39;-&gt;&#39;</span><span class="p">,</span><span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+    <span class="n">GWP_text</span><span class="p">,</span>
+    <span class="n">xy</span><span class="o">=</span><span class="n">xy_CH4</span><span class="p">,</span>
+    <span class="n">xytext</span><span class="o">=</span><span class="n">xy_text</span><span class="p">,</span>
+    <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s1">&#39;-&gt;&#39;</span><span class="p">,</span><span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/e496db86452ba50bc61ebf05f3f19432361c91414fb518fe2e33c219de753f00.png" src="../_images/e496db86452ba50bc61ebf05f3f19432361c91414fb518fe2e33c219de753f00.png" />
+</div>
+</div>
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, Blane Grann.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

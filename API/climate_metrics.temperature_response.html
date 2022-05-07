@@ -8,32 +8,37 @@
 
     <title>climate_metrics.temperature_response &#8212; climate metrics 2022.1.0 documentation</title>
     
-    <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-  
+
     
-    <link rel="stylesheet"
-      href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
-  
-    
-      
-  
-    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/pydata-sphinx-theme.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
     
-    <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
-  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How-to" href="../How-to.html" />
     <link rel="prev" title="climate_metrics.GTP" href="climate_metrics.GTP.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -42,7 +47,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -72,6 +77,12 @@
     <li class="toctree-l1 current active nav-item">
  <a class="reference internal nav-link" href="../API.html">
   API reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../How-to.html">
+  How-to
  </a>
 </li>
 
@@ -171,10 +182,10 @@
               <div>
                 
   <section id="climate-metrics-temperature-response">
-<h1>climate_metrics.temperature_response<a class="headerlink" href="#climate-metrics-temperature-response" title="Permalink to this headline">¶</a></h1>
+<h1>climate_metrics.temperature_response<a class="headerlink" href="#climate-metrics-temperature-response" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="climate_metrics.temperature_response">
-<span class="sig-prename descclassname"><span class="pre">climate_metrics.</span></span><span class="sig-name descname"><span class="pre">temperature_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_horizon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emissions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">GHG</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#climate_metrics.temperature_response" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">climate_metrics.</span></span><span class="sig-name descname"><span class="pre">temperature_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_horizon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emissions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">GHG</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#climate_metrics.temperature_response" title="Permalink to this definition">#</a></dt>
 <dd><p>Computes the global mean temperature change at in response to an emission scenario.</p>
 <p>The <cite>temperature_response</cite> is computed using a convolution of emissions
 and absolute global temperature change potential (<cite>AGTP</cite>):</p>
@@ -216,6 +227,13 @@ and absolute global temperature change potential (<cite>AGTP</cite>):</p>
             <p class="prev-next-title">climate_metrics.GTP</p>
         </div>
     </a>
+    <a class='right-next' id="next-link" href="../How-to.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">How-to</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
 </div>
               
           </main>
@@ -224,8 +242,9 @@ and absolute global temperature change potential (<cite>AGTP</cite>):</p>
       </div>
     </div>
   
-    <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
-  <footer class="footer mt-5 mt-md-0">
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
   <div class="container">
     
     <div class="footer-item">
@@ -236,7 +255,7 @@ and absolute global temperature change potential (<cite>AGTP</cite>):</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     
