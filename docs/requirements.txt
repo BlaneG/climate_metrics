@@ -9,6 +9,8 @@ pydata-sphinx-theme
 # for rendering .ipynb files
 myst-nb
 
-# package requirements
+# requirements for running notebooks
+jupyterlab
+matplotlib
 numpy
 scipy
