@@ -10,13 +10,41 @@ import numpy as np
 # Physical models and parameters
 # These are the building blocks for GWP and GTP
 #######################
-# W m–2 ppbv-1
-RADIATIVE_EFFICIENCY_ppbv = {"co2": 1.37e-5, "ch4": 3.63e-4, "n2o": 3.00e-3}
-COEFFICIENT_WEIGHTS = np.array([0.2173, 0.2240, 0.2824, 0.2763])
-TIME_SCALES = np.array([394.4, 36.54, 4.304])
+def _radiative_efficiency_ppbv():
+    """
+    Notes
+    -----
+    Table 8.A.1 in [1]_
+
+    References
+    ----------
+    .. [1] Myhre et al. 2013.  Anthropogenic and Natural Radiative Forcing."""
+    # W m–2 ppbv-1
+    return {'RADIATIVE_EFFICIENCY_ppbv': {"co2": 1.37e-5, "ch4": 3.63e-4, "n2o": 3.00e-3}}
+
+def _atmospheric_lifetime_parameters():
+    """
+    Notes
+    -----
+    Table 8.SM.10 in [1]_
+    
+    References
+    ----------
+    .. [1] Myhre et al. 2013. Anthropogenic and Natural Radiative Forcing Supplementary Material.
+    
+    """
+    return {
+        'COEFFICIENT_WEIGHTS': np.array([0.2173, 0.2240, 0.2824, 0.2763]),
+        'TIME_SCALES': np.array([394.4, 36.54, 4.304])
+    }
 
 
 def _get_GHG_lifetime(GHG):
+    """
+    Notes
+    -----
+    Table 8.A.1
+    """
     ghg_lifetimes = dict(
         ch4=12.4,
         n2o=121
@@ -47,6 +75,7 @@ def _get_radiative_efficiency_kg(GHG):
     """Get the radiative efficiency of a GHG in W m–2 kg–1.
     """
     ppv_to_kg = _ppbv_to_kg_conversion(GHG)
+    RADIATIVE_EFFICIENCY_ppbv = _radiative_efficiency_ppbv()['RADIATIVE_EFFICIENCY_ppbv']
     return ppv_to_kg * RADIATIVE_EFFICIENCY_ppbv[GHG]
 
 
@@ -63,6 +92,8 @@ def CO2_irf(time_horizon):
     IPCC 2013. AR5, WG1, Chapter 8 Supplementary Material. Equation 8.SM.10
     https://www.ipcc.ch/report/ar5/wg1/
     """
+    COEFFICIENT_WEIGHTS = _atmospheric_lifetime_parameters()['COEFFICIENT_WEIGHTS']
+    TIME_SCALES = _atmospheric_lifetime_parameters()['TIME_SCALES']
 
     exponential_1 = np.exp(-time_horizon/TIME_SCALES[0])
     exponential_2 = np.exp(-time_horizon/TIME_SCALES[1])
@@ -167,10 +198,22 @@ def _convolve_metric(steps, step_size, emissions, metric, mode):
 ###############################
 
 def AGWP_CO2(t):
+    """
+    Cumulative radiative forcing (Wm^-2yrkg^-1) of CO2.
+    
+    Notes
+    -----
+    see equation 8.SM.11 and table 8.SM.10 in https://www.ipcc.ch/site/assets/uploads/2018/07/WGI_AR5.Chap_.8_SM.pdf
+    """
+    COEFFICIENT_WEIGHTS = _atmospheric_lifetime_parameters()['COEFFICIENT_WEIGHTS']
+    TIME_SCALES = _atmospheric_lifetime_parameters()['TIME_SCALES']
+
     radiative_efficiency = _get_radiative_efficiency_kg("co2")
+
     exponential_1 = 1 - np.exp(-t/TIME_SCALES[0])
     exponential_2 = 1 - np.exp(-t/TIME_SCALES[1])
     exponential_3 = 1 - np.exp(-t/TIME_SCALES[2])
+
     cumulative_concentration = (
         COEFFICIENT_WEIGHTS[0]*t
         + COEFFICIENT_WEIGHTS[1]*TIME_SCALES[0]*exponential_1
@@ -209,6 +252,7 @@ def AGWP_CH4_no_CO2(t):
 
 
 def _N2O_radiative_efficiency_after_methane_adjustment():
+    RADIATIVE_EFFICIENCY_ppbv = _radiative_efficiency_ppbv()['RADIATIVE_EFFICIENCY_ppbv']
     indirect_effect_of_N2O_on_CH4 = 0.36
     methane_adjustments = _scaled_radiative_efficiency_from_O3_and_H2O()
     radiative_efficiency_CH4_ppbv = RADIATIVE_EFFICIENCY_ppbv['ch4']
@@ -386,6 +430,9 @@ def AGTP_CO2(t):
     see equation 8.SM.15 in Myhre et al., 2013. Anthropogenic and Natural Radiative
       Forcing: Supplementary Material. 
     """
+    COEFFICIENT_WEIGHTS = _atmospheric_lifetime_parameters()['COEFFICIENT_WEIGHTS']
+    TIME_SCALES = _atmospheric_lifetime_parameters()['TIME_SCALES']
+
     radiative_efficiency = _get_radiative_efficiency_kg("co2")
 
     temperature_response = 0
