@@ -153,24 +153,26 @@ ONE_FIFTY_1000[int(50/0.1)] = C_EMISSIONS
 
 # time_horizon, emissions, emission_type, step_size
 GWP_tests = [
-    ((100, 1, 'co2', 1), 1),
+    ((100, 1, 'co2', 1), 1, 3),
     # Scale emissions by step_size so integral of emissions == 1
-    ((100, 1/0.1, 'co2', 0.1), 1),
-    ((100, ONE_ZERO_100, 'CO2', 1), 1),
-    ((100, 1, 'ch4', 1), 28.40146),
+    ((100, 1/0.1, 'co2', 0.1), 1, 3),
+    ((100, ONE_ZERO_100, 'CO2', 1), 1, 3),
+    ((100, 1, 'ch4', 1), 28.40146, 3),
     # Scale emissions by step_size so integral of emissions == 1
-    ((100, 1/0.1, 'ch4', 0.1), 28.40146),
-    ((100, ONE_ZERO_100, 'ch4', 1), 28.40146),
-    ((100, ONE_FIFTY_100, 'co2', 1), 0.57808),
+    ((100, 1/0.1, 'ch4', 0.1), 28.40146, 3),
+    ((100, ONE_ZERO_100, 'ch4', 1), 28.40146, 3),
+    ((100, ONE_FIFTY_100, 'co2', 1), 0.57808, 3),
     # Scale emissions by step_size so integral of emissions == 1
-    ((100, ONE_FIFTY_1000/0.1, 'co2', 0.1), 0.57808),
-    ((100, ONE_FIFTY_100, 'ch4', 1), 27.90656),
+    ((100, ONE_FIFTY_1000/0.1, 'co2', 0.1), 0.57808, 3),
+    ((100, ONE_FIFTY_100, 'ch4', 1), 27.90656, 3),
+    ((100, 1, 'n2o', 1), 265, 0),  # AGWP_CO2 variance from table 8.A.1 leads to error at 3rd digit
+    ((20, 1, 'n2o', 1), 264, 0),  # AGWP_CO2 variance from table 8.A.1 leads to error at 3rd digit
     ]
 
 
-@pytest.mark.parametrize("test_input, expected", GWP_tests)
-def test_GWP(test_input, expected):
-    assert_array_almost_equal(GWP(*test_input), expected, decimal=3)
+@pytest.mark.parametrize("test_input, expected, decimal", GWP_tests)
+def test_GWP(test_input, expected, decimal):
+    assert_array_almost_equal(GWP(*test_input), expected, decimal=decimal)
 
 
 GTP_tests1 = [
