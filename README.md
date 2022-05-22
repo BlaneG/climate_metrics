@@ -1,7 +1,7 @@
 # Climate metrics
 `climate_metrics` implements standard greenhouse gas methods including Global Warming Potential (GWP) and Average Global Temperature Change Potential (GTP).  The implementation provides flexibility for computing climate metrics for a time series of GHG emissions (e.g., an emissions scenario). 
 
-You can find the documentation [here](https://blaneg.github.io/climate_metrics/), and a quick demonstration of how to use the package [here](https://blaneg.github.io/climate_metrics/notebooks/A-motivating-example.html).
+You can find the documentation [here](https://blaneg.github.io/climate_metrics/), including an [explanation](https://blaneg.github.io/climate_metrics/notebooks/IPCC_climate_metrics.html) and a quick demonstration of how to use the package [here](https://blaneg.github.io/climate_metrics/notebooks/A-motivating-example.html).
 
 
 ## Installation
